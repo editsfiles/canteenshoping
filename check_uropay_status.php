@@ -209,27 +209,17 @@ if (!empty($userUtr)) {
     }
 }
 
-/*
-|--------------------------------------------------------------------------
-| ⚡ FAST CONFIRM MODE (10-15s INSTANT CONFIRMATION)
-|--------------------------------------------------------------------------
-| When student has paid in UPI app and wants instant confirmation without 
-| waiting 2-3 minutes for gateway cron batch synchronization.
-*/
-$isFastConfirm = isset($_REQUEST['fast_confirm']) && ($_REQUEST['fast_confirm'] === '1' || $_REQUEST['fast_confirm'] === 'true');
-
 $url = UROPAY_API_URL . "/order/status/" . rawurlencode($uroPayOrderId);
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 4);
-curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Accept: application/json",
     "Content-Type: application/json",
     "X-API-KEY: " . UROPAY_API_KEY
 ]);
-
 
 $response = curl_exec($ch);
 $curlError = curl_error($ch);
@@ -241,33 +231,30 @@ curl_close($ch);
 | CURL ERROR & RESPONSE VALIDATION
 |--------------------------------------------------------------------------
 */
-if (($response === false || $curlError || !is_array(json_decode($response, true))) && $isFastConfirm) {
-    // Fast confirm bypasses temporary gateway network delay
-    $result = ['data' => ['orderStatus' => 'PAID']];
-} elseif ($response === false || $curlError) {
+if ($response === false || $curlError) {
     echo json_encode([
         "success" => false,
         "status" => "UNKNOWN",
-        "message" => "Unable to contact UroPay.",
+        "message" => "Unable to contact UroPay gateway.",
         "error" => $curlError
     ]);
     exit();
-} else {
-    $result = json_decode($response, true);
-    if (!is_array($result)) {
-        echo json_encode([
-            "success" => false,
-            "status" => "UNKNOWN",
-            "message" => "Invalid response from UroPay.",
-            "http_code" => $httpCode
-        ]);
-        exit();
-    }
+}
+
+$result = json_decode($response, true);
+if (!is_array($result)) {
+    echo json_encode([
+        "success" => false,
+        "status" => "UNKNOWN",
+        "message" => "Invalid response from UroPay.",
+        "http_code" => $httpCode
+    ]);
+    exit();
 }
 
 /*
 |--------------------------------------------------------------------------
-| GET UROPAY STATUS
+| GET UROPAY STATUS (STRICT GATEWAY VERIFICATION)
 |--------------------------------------------------------------------------
 */
 $uroStatus = "";
@@ -290,10 +277,6 @@ $localStatus = "Pending";
 
 if (isSuccessfulUroPayStatus($uroStatus)) {
     $localStatus = "Completed";
-} elseif ($isFastConfirm) {
-    // ⚡ 10-15s Fast Confirm
-    $localStatus = "Completed";
-    $uroStatus = "PAID";
 } elseif (isCancelledUroPayStatus($uroStatus)) {
     $localStatus = "Cancelled";
 }
@@ -351,10 +334,6 @@ if (
 $bankUtr = '';
 if (isset($result['data']) && is_array($result['data'])) {
     $bankUtr = trim((string)($result['data']['referenceNumber'] ?? ($result['data']['utr'] ?? ($result['data']['transactionId'] ?? ''))));
-}
-if (empty($bankUtr) && $isFastConfirm) {
-    $bankUtr = 'UPI' . date('ymdHis') . rand(1000, 9999);
-    $paymentId = $bankUtr;
 }
 
 $stmt = mysqli_prepare(

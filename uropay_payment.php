@@ -352,86 +352,6 @@ body {
 .btn-verify:disabled {
     background: #94a3b8;
     cursor: not-allowed;
-    transform: none;
-}
-
-/* ==========================================================================
-   ⚡ HIGH-SPEED 10-15s FAST CONFIRMATION COMPONENT
-   ========================================================================== */
-.fast-confirm-container {
-    margin: 14px 0 12px;
-    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
-    border: 2px solid #86efac;
-    border-radius: 14px;
-    padding: 14px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.12);
-}
-
-.fast-confirm-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 13px;
-    font-weight: 700;
-    color: #15803d;
-    margin-bottom: 8px;
-}
-
-.fast-progress-bar-bg {
-    width: 100%;
-    height: 7px;
-    background: #dcfce7;
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 12px;
-}
-
-.fast-progress-bar-fill {
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, #10b981, #059669);
-    border-radius: 6px;
-    transition: width 1s linear;
-}
-
-.btn-instant-confirm {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #16a34a, #15803d);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 13px 18px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
-    transition: all 0.2s ease;
-    animation: pulseGlow 2s infinite;
-}
-
-.btn-instant-confirm:hover {
-    background: linear-gradient(135deg, #15803d, #166534);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.45);
-}
-
-.btn-instant-confirm:disabled {
-    background: #94a3b8;
-    cursor: not-allowed;
-    transform: none;
-    animation: none;
-    box-shadow: none;
-}
-
-@keyframes pulseGlow {
-    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
-    70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
 .actions-row {
@@ -656,26 +576,6 @@ body {
     <div id="statusBox" class="status-box">
         <div class="spinner"></div>
         <span id="statusText">Waiting for payment confirmation...</span>
-    </div>
-
-    <!-- ⚡ HIGH-SPEED 10-15s ORDER CONFIRMATION -->
-    <div class="fast-confirm-container">
-        <div class="fast-confirm-header">
-            <span><i class="fa-solid fa-bolt-lightning" style="color:#eab308;"></i> 10–15s Fast Confirm Active</span>
-            <span id="fastCountdownBadge" style="background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:700;">
-                <span id="syncCountdown">15</span>s
-            </span>
-        </div>
-        <div class="fast-progress-bar-bg">
-            <div id="fastProgressFill" class="fast-progress-bar-fill"></div>
-        </div>
-        <button type="button" id="btnInstantConfirm" class="btn-instant-confirm" onclick="triggerFastConfirm()">
-            <i class="fa-solid fa-bolt-lightning"></i> ⚡ Confirm Order Now (Paid in UPI)
-        </button>
-        <div id="fastConfirmMsg" style="display:none; font-size:12px; margin-top:8px; font-weight:600; color:#15803d;"></div>
-        <div style="font-size:11px; color:#64748b; margin-top:6px;">
-            Completed payment in GPay / PhonePe / Paytm? Tap above to confirm within 10–15 seconds without waiting!
-        </div>
     </div>
 
     <!-- PRIMARY VERIFY BUTTON -->
@@ -1166,54 +1066,6 @@ async function submitManualUtr() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ⚡ TRIGGER FAST CONFIRM (10-15s Confirmation Handler)
-// ─────────────────────────────────────────────────────────────────────────────
-async function triggerFastConfirm() {
-    const btn = document.getElementById("btnInstantConfirm");
-    const msg = document.getElementById("fastConfirmMsg");
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirming Order with Bank...';
-    }
-    if (msg) {
-        msg.style.display = "block";
-        msg.style.color = "#0284c7";
-        msg.innerText = "⚡ Synchronizing payment with kitchen...";
-    }
-
-    try {
-        const res = await fetch("check_uropay_status.php?order_id=" + encodeURIComponent(orderId) + "&fast_confirm=1&t=" + Date.now(), { cache: "no-store" });
-        const data = await res.json();
-
-        if (data.success && (data.status === "PAID" || data.status === "Completed")) {
-            if (msg) {
-                msg.style.color = "#16a34a";
-                msg.innerHTML = "✅ Payment Confirmed! Preparing your order...";
-            }
-            clearInterval(paymentTimer);
-            setTimeout(() => {
-                redirectToSuccess(data.payment_id);
-            }, 500);
-        } else {
-            if (msg) {
-                msg.style.color = "#dc2626";
-                msg.innerText = "Payment not yet detected. If already paid, enter 12-digit UTR below.";
-            }
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-bolt-lightning"></i> ⚡ Confirm Order Now (Paid in UPI)';
-            }
-        }
-    } catch (e) {
-        console.error("Fast confirm error:", e);
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-bolt-lightning"></i> ⚡ Confirm Order Now (Paid in UPI)';
-        }
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // AUTO-DETECT 12-DIGIT UTR INPUT
 // ─────────────────────────────────────────────────────────────────────────────
 const utrInput = document.getElementById("manualUtrInput");
@@ -1226,23 +1078,6 @@ if (utrInput) {
         }
     });
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 10-15s COUNTDOWN PROGRESS BAR
-// ─────────────────────────────────────────────────────────────────────────────
-let countdownSeconds = 15;
-const countdownInterval = setInterval(() => {
-    countdownSeconds--;
-    const counterEl = document.getElementById("syncCountdown");
-    const fillEl = document.getElementById("fastProgressFill");
-    if (counterEl) counterEl.innerText = Math.max(0, countdownSeconds);
-    if (fillEl) fillEl.style.width = Math.max(0, (countdownSeconds / 15) * 100) + "%";
-
-    if (countdownSeconds <= 0) {
-        clearInterval(countdownInterval);
-        if (counterEl) counterEl.innerText = "Ready";
-    }
-}, 1000);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AUTO-START on page load — the QR is already showing, begin tracking now
