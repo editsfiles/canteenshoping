@@ -7,7 +7,7 @@
 *.sln
 *.sw?
 
-# Log files and test sessions
+# Logs and local runtime files
 *.log
 webhook_log.txt
 *cookie*.txt
@@ -16,3 +16,8 @@ webhook_log.txt
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Local secrets / environment
+.env
+.env.*
+!.env.example
