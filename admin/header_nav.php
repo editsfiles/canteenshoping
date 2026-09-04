@@ -14,7 +14,7 @@ if (!isset($activePage)) {
 <header class="admin-top-nav">
     <a href="dashboard.php" class="admin-logo">
         <i class="fa-solid fa-utensils"></i>
-        <span>CanteenAdmin</span>
+        <span>College Canteen Admin</span>
     </a>
 
     <nav class="admin-menu">
@@ -43,11 +43,11 @@ if (!isset($activePage)) {
             <i class="fa-solid fa-circle" style="font-size:8px; color:#34d399;"></i> Live
         </span>
 
-       <br> <span class="nav-live-clock" title="Real-time Indian Standard Time (IST)">
+        <span class="nav-live-clock" title="Real-time Indian Standard Time (IST)">
             <i class="fa-regular fa-clock" style="color:#67e8f9;"></i> <span id="adminLiveClock"><?php echo date('h:i:s A'); ?> IST</span>
         </span>
 
-        <a href="logout.php" class="logout-btn">
+        <a href="logout.php" class="logout-btn" onclick="return confirm('Are you sure you want to log out of the Admin Panel?');" title="Logout from Admin">
             <i class="fa-solid fa-right-from-bracket"></i> Logout
         </a>
     </nav>
