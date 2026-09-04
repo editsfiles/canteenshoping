@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: canteenshoping
+    runtime: docker
+    repo: https://github.com/editsfiles/canteenshoping.git
+    branch: main
+    region: singapore
+    plan: free
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile
