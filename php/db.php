@@ -30,8 +30,9 @@ if ($db_port <= 0)   $db_port = 3306;
 mysqli_report(MYSQLI_REPORT_OFF);
 
 $conn = null;
+$connectError = '';
 
-// On Linux, if socket file exists, connecting via socket is fastest and most reliable
+// Check socket paths on Linux
 $socketPaths = ['/var/run/mysqld/mysqld.sock', '/run/mysqld/mysqld.sock', '/tmp/mysql.sock'];
 $foundSocket = null;
 if ($db_host === 'localhost' || $db_host === '127.0.0.1') {
@@ -43,24 +44,39 @@ if ($db_host === 'localhost' || $db_host === '127.0.0.1') {
     }
 }
 
+// 1. Try socket connection first if socket file exists on Linux
 if ($foundSocket) {
     $conn = @mysqli_connect('localhost', $db_user, $db_pass, $db_name, $db_port, $foundSocket);
+    if (!$conn) {
+        // Try fallback user
+        $conn = @mysqli_connect('localhost', 'canteen_user', 'canteen_pass', $db_name, $db_port, $foundSocket);
+    }
 }
 
-// Next attempt configured target host
+// 2. Try TCP connection to configured host
 if (!$conn) {
     $conn = @mysqli_connect($db_host, $db_user, $db_pass, $db_name, $db_port);
+    if (!$conn) {
+        $connectError = mysqli_connect_error();
+        // Try fallback user on TCP
+        $conn = @mysqli_connect($db_host, 'canteen_user', 'canteen_pass', $db_name, $db_port);
+    }
 }
 
-// If failed and target was 127.0.0.1 or localhost, try alternating TCP / localhost
+// 3. Try alternative between 127.0.0.1 and localhost
 if (!$conn && ($db_host === '127.0.0.1' || $db_host === 'localhost')) {
     $altHost = ($db_host === '127.0.0.1') ? 'localhost' : '127.0.0.1';
     $conn = @mysqli_connect($altHost, $db_user, $db_pass, $db_name, $db_port);
+    if (!$conn) {
+        $conn = @mysqli_connect($altHost, 'canteen_user', 'canteen_pass', $db_name, $db_port);
+    }
 }
 
 // If connection still failed, display a helpful diagnostic guide instead of crashing with a raw Fatal Error
 if (!$conn) {
-    $connectError = mysqli_connect_error() ?: 'Unknown MySQL connection failure';
+    if (empty($connectError)) {
+        $connectError = mysqli_connect_error() ?: 'Unknown MySQL connection failure';
+    }
     
     // For CLI or JSON API requests, return plain error
     if (php_sapi_name() === 'cli' || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)) {
