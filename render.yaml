@@ -8,3 +8,22 @@ services:
     plan: free
     autoDeploy: true
     dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DB_HOST
+        value: 127.0.0.1
+      - key: DB_USER
+        value: root
+      - key: DB_PASSWORD
+        value: ""
+      - key: DB_NAME
+        value: canteen_db
+      - key: DB_PORT
+        value: "3306"
+      - key: UROPAY_API_URL
+        value: https://api.uropay.me
+      - key: UROPAY_API_KEY
+        value: G994K1P445AJ28UL
+      - key: UROPAY_SECRET
+        value: XUJCZN35BLV431DUKMBJHX8M3UW3RXMN8ZYMHL7SAUG4WYAPWJ
+      - key: CANTEEN_UPI_ID
+        value: canteen@upi
