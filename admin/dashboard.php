@@ -186,7 +186,7 @@ $activePage = 'dashboard';
                                 </span>
                                 <?php if (strtolower($status) === 'cancelled' || strtolower($status) === 'canceled'): ?>
                                     <div style="font-size:11px; color:#b91c1c; font-weight:700; margin-top:3px; line-height:1.2;">
-                                        <i class="fa-solid fa-rotate-left"></i> Auto-Refund: 24-48 hrs
+                                        <i class="fa-solid fa-bolt" style="color:#d97706;"></i> Auto-Refund: 10 mins
                                     </div>
                                 <?php endif; ?>
                             </td>

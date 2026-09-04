@@ -32,12 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order_id'])) {
             $curFoodStatus = strtolower(trim($orderToCancel['food_status']));
 
             if ($curStatus === 'cancelled' || $curStatus === 'canceled') {
-                $cancelMsg = "<div class='cancel-alert warning'><i class='fa-solid fa-triangle-exclamation'></i> Order #$cancelOrderId is already cancelled. Refund is processing within 24 to 48 hours.</div>";
+                $cancelMsg = "<div class='cancel-alert warning'><i class='fa-solid fa-triangle-exclamation'></i> Order #$cancelOrderId is already cancelled. Refund is processing automatically within 10 minutes.</div>";
             } elseif ($curFoodStatus === 'delivered') {
                 $cancelMsg = "<div class='cancel-alert danger'><i class='fa-solid fa-circle-xmark'></i> Cannot cancel Order #$cancelOrderId: The food has already been delivered.</div>";
             } else {
-                $refundNotes = "Order cancelled. Amount ₹" . number_format($orderToCancel['total_amount'], 2) . " will be refunded automatically within 24 to 48 hours.";
-                $upd = mysqli_prepare($conn, "UPDATE orders SET status = 'Cancelled', food_status = 'Cancelled', refund_status = 'Refund Processing (24-48 hrs)', refund_notes = ? WHERE id = ? AND user_id = ?");
+                $refundNotes = "Order cancelled. Amount ₹" . number_format($orderToCancel['total_amount'], 2) . " will be refunded automatically within 10 minutes directly to your source UPI account.";
+                $upd = mysqli_prepare($conn, "UPDATE orders SET status = 'Cancelled', food_status = 'Cancelled', refund_status = 'Refund Processing (Within 10 mins)', refund_notes = ? WHERE id = ? AND user_id = ?");
                 if ($upd) {
                     mysqli_stmt_bind_param($upd, "sii", $refundNotes, $cancelOrderId, $user_id);
                     mysqli_stmt_execute($upd);
@@ -45,12 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order_id'])) {
                 }
 
                 // Log automatic refund request
-                $logLine = "[" . date('Y-m-d H:i:s') . "] ORDER CANCELLED: Order #" . $cancelOrderId . " | Amount: ₹" . $orderToCancel['total_amount'] . " | Auto-Refund Policy: 24 to 48 Hours\n";
+                $logLine = "[" . date('Y-m-d H:i:s') . "] ORDER CANCELLED: Order #" . $cancelOrderId . " | Amount: ₹" . $orderToCancel['total_amount'] . " | Fast Auto-Refund Policy: Within 10 Minutes\n";
                 @file_put_contents("webhook_log.txt", $logLine, FILE_APPEND);
 
                 $cancelMsg = "<div class='cancel-alert success'>
                     <h4 style='margin:0 0 6px; font-size:16px;'><i class='fa-solid fa-circle-check'></i> Order #$cancelOrderId Cancelled Successfully</h4>
-                    <p style='margin:0;'>The order has been cancelled. Your amount of <strong>₹" . number_format($orderToCancel['total_amount'], 2) . "</strong> will be <strong>refunded automatically within 24 to 48 hours</strong> to your original payment method / UPI account.</p>
+                    <p style='margin:0;'>The order has been cancelled. Your amount of <strong>₹" . number_format($orderToCancel['total_amount'], 2) . "</strong> will be <strong>refunded automatically within 10 minutes</strong> directly to your original payment method / UPI account.</p>
                 </div>";
             }
         }
@@ -760,7 +760,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         <?php if (in_array(strtolower(trim($status)), ['cancelled', 'canceled', 'failed'], true)): ?>
             <div style="font-size:11px; color:#b91c1c; font-weight:700; margin-top:5px; line-height:1.3;">
-                <i class="fa-solid fa-clock-rotate-left"></i> Refund in 24-48 hrs
+                <i class="fa-solid fa-bolt" style="color:#d97706;"></i> Refund in 10 mins
             </div>
         <?php endif; ?>
 
@@ -868,12 +868,12 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         <?php if ($isCancelled): ?>
             <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#b91c1c; font-weight:600; padding:5px 10px; background:#fee2e2; border-radius:6px; border:1px solid #fecaca; white-space:nowrap;">
-                <i class="fa-solid fa-rotate-left"></i> Auto-Refund Initiated
+                <i class="fa-solid fa-bolt"></i> Auto-Refund in 10 mins
             </span>
         <?php elseif (!$isDelivered): ?>
-            <form method="POST" style="margin:0; display:inline;" onsubmit="return confirm('Cancel Order #<?php echo $orderId; ?>?\n\nIf you have already paid, the total amount of ₹<?php echo number_format($totalAmount, 2); ?> will be refunded automatically to your original UPI / Bank account within 24 to 48 hours.');">
+            <form method="POST" style="margin:0; display:inline;" onsubmit="return confirm('Cancel Order #<?php echo $orderId; ?>?\n\nIf you have already paid, the total amount of ₹<?php echo number_format($totalAmount, 2); ?> will be refunded automatically to your original UPI / Bank account within 10 minutes.');">
                 <input type="hidden" name="cancel_order_id" value="<?php echo $orderId; ?>">
-                <button type="submit" class="cancel-btn" title="Cancel order and trigger automatic 24-48 hr refund">
+                <button type="submit" class="cancel-btn" title="Cancel order and trigger automatic 10-min refund">
                     <i class="fa-solid fa-xmark"></i> Cancel
                 </button>
             </form>

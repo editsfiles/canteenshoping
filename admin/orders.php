@@ -66,8 +66,8 @@ if (isset($_POST['update'])) {
     if ($id > 0 && in_array($foodStatus, $allowedFoodStatus, true)) {
         if (!empty($paymentStatus) && in_array($paymentStatus, $allowedPaymentStatus, true)) {
             if ($paymentStatus === 'Cancelled' || $foodStatus === 'Cancelled') {
-                $refNote = "Cancelled by Admin. Automatic refund of paid amount processed within 24 to 48 hours.";
-                $stmt = mysqli_prepare($conn, "UPDATE orders SET food_status = ?, status = ?, refund_status = 'Refund Processing (24-48 hrs)', refund_notes = ? WHERE id = ?");
+                $refNote = "Cancelled by Admin. Automatic refund of paid amount processed within 10 minutes.";
+                $stmt = mysqli_prepare($conn, "UPDATE orders SET food_status = ?, status = ?, refund_status = 'Refund Processing (Within 10 mins)', refund_notes = ? WHERE id = ?");
                 if ($stmt) {
                     mysqli_stmt_bind_param($stmt, "sssi", $foodStatus, $paymentStatus, $refNote, $id);
                     mysqli_stmt_execute($stmt);
@@ -421,7 +421,7 @@ if (!$result) {
                             </span>
                             <?php if (strtolower($status) === 'cancelled' || strtolower($status) === 'canceled'): ?>
                                 <div style="font-size:11px; color:#b91c1c; font-weight:700; margin-top:3px; line-height:1.2;">
-                                    <i class="fa-solid fa-rotate-left"></i> Auto-Refund (24-48 hrs)
+                                    <i class="fa-solid fa-bolt" style="color:#d97706;"></i> Auto-Refund (10 mins)
                                 </div>
                             <?php endif; ?>
                         </td>

@@ -700,7 +700,7 @@ body {
         ⚠️ Order Cancelled - Automatic Refund Policy Active
     </h4>
     <p style="margin:0; font-size:14px; line-height:1.5;">
-        This order has been cancelled. The total amount of <strong>₹<?php echo number_format($totalAmount, 2); ?></strong> will be <strong>refunded automatically within 24 to 48 hours</strong> directly to your original payment method / UPI account.
+        This order has been cancelled. The total amount of <strong>₹<?php echo number_format($totalAmount, 2); ?></strong> will be <strong>refunded automatically within 10 minutes</strong> directly to your original payment method / UPI account.
     </p>
 </div>
 <?php } ?>
