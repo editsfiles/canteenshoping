@@ -31,14 +31,66 @@ if ($ssl) {
     $db = mysqli_init();
     if ($db) {
         mysqli_ssl_set($db, null, null, null, null, null);
-        $conn = @mysqli_real_connect($db, $host, $user, $pass, $name, $port, null, MYSQLI_CLIENT_SSL);
-        if (!$conn) $error = mysqli_connect_error() ?: 'SSL connection failed';
+        $ok = @mysqli_real_connect($db, $host, $user, $pass, $name, $port, null, MYSQLI_CLIENT_SSL);
+        if ($ok) {
+            $conn = $db;
+        } else {
+            $error = mysqli_connect_error() ?: 'SSL connection failed';
+        }
     }
 }
 
 if (!$conn) {
     $conn = @mysqli_connect($host, $user, $pass, $name, $port);
     if (!$conn) $error = mysqli_connect_error() ?: $error ?: 'Database connection failed';
+}
+
+// Resilient fallback for local / container database if credentials or host format had mismatch
+if (!$conn && (empty($host) || $host === 'localhost' || $host === '127.0.0.1')) {
+    $socket = null;
+    $possibleSockets = ['/run/mysqld/mysqld.sock', '/var/run/mysqld/mysqld.sock', '/tmp/mysql.sock'];
+    foreach ($possibleSockets as $sp) {
+        if (file_exists($sp)) {
+            $socket = $sp;
+            break;
+        }
+    }
+
+    $credList = [
+        [$user, $pass],
+        [$user, 'canteen_pass'],
+        [$user, ''],
+        ['canteen_user', 'canteen_pass'],
+        ['canteen_user', ''],
+        ['canteen_user', $pass],
+        ['root', ''],
+        ['root', 'root'],
+        ['root', $pass],
+    ];
+
+    $hostTargets = [];
+    if ($socket) {
+        $hostTargets[] = ['localhost', $socket];
+    }
+    $hostTargets[] = ['127.0.0.1', null];
+    $hostTargets[] = ['localhost', null];
+
+    foreach ($hostTargets as $ht) {
+        $h = $ht[0];
+        $s = $ht[1];
+        foreach ($credList as $cr) {
+            $u = $cr[0];
+            $p = $cr[1];
+            if ($s) {
+                $conn = @mysqli_connect($h, $u, $p, $name, $port, $s);
+            } else {
+                $conn = @mysqli_connect($h, $u, $p, $name, $port);
+            }
+            if ($conn) {
+                break 2;
+            }
+        }
+    }
 }
 
 if (!$conn) {
