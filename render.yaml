@@ -27,3 +27,5 @@ services:
         value: XUJCZN35BLV431DUKMBJHX8M3UW3RXMN8ZYMHL7SAUG4WYAPWJ
       - key: CANTEEN_UPI_ID
         value: canteen@upi
+      - key: PORT
+        value: "10000"

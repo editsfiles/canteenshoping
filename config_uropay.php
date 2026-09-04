@@ -5,7 +5,12 @@ define("UROPAY_API_KEY", getenv('UROPAY_API_KEY') ?: "G994K1P445AJ28UL");
 define("UROPAY_SECRET", getenv('UROPAY_SECRET') ?: "XUJCZN35BLV431DUKMBJHX8M3UW3RXMN8ZYMHL7SAUG4WYAPWJ");
 define("CANTEEN_UPI_ID", getenv('CANTEEN_UPI_ID') ?: "canteen@upi");
 
-define("SITE_URL", rtrim(getenv('SITE_URL') ?: 'http://127.0.0.1:8080', '/'));
+$detectedSiteUrl = '';
+if (!empty($_SERVER['HTTP_HOST'])) {
+    $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ? 'https://' : 'http://';
+    $detectedSiteUrl = $proto . $_SERVER['HTTP_HOST'];
+}
+define("SITE_URL", rtrim(getenv('SITE_URL') ?: ($detectedSiteUrl ?: 'http://127.0.0.1:8080'), '/'));
 define("UROPAY_REDIRECT_URL", SITE_URL . "/payment_success.php");
 define("UROPAY_SUCCESS_URL",  SITE_URL . "/payment_success.php");
 define("UROPAY_FAILURE_URL",  SITE_URL . "/payment_failed.php");
