@@ -53,7 +53,10 @@ include("php/db.php");
 
 <h1>
 Welcome,
-<?php echo htmlspecialchars($_SESSION['user_name']); ?> 👋
+<?php 
+$displayName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? $_SESSION['username'] ?? 'Student';
+echo htmlspecialchars($displayName); 
+?> 👋
 </h1>
 
 <p>
