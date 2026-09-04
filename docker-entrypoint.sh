@@ -1,11 +1,12 @@
 #!/bin/bash
+set -e
 
 echo "=== Starting Canteen Shopping Container ==="
 
 APACHE_PORT="${PORT:-80}"
 echo "Configuring Apache to listen on port ${APACHE_PORT}..."
 sed -i "s/Listen [0-9]*/Listen ${APACHE_PORT}/g" /etc/apache2/ports.conf 2>/dev/null || true
-sed -i "s/<VirtualHost \*:[0-9]*>/<VirtualHost \*:${APACHE_PORT}>/g" /etc/apache2/sites-available/000-default.conf 2>/dev/null || true
+sed -i "s/<VirtualHost \*:[0-9]*>/<VirtualHost *:${APACHE_PORT}>/g" /etc/apache2/sites-available/000-default.conf 2>/dev/null || true
 
 DB_NAME="${DB_NAME:-canteen_db}"
 DB_USER="${DB_USER:-root}"
@@ -30,7 +31,6 @@ max_connections = 50
 table_open_cache = 100
 query_cache_size = 0
 bind-address = 0.0.0.0
-skip-grant-tables
 EOF
 
     if [ ! -d "/var/lib/mysql/mysql" ]; then
@@ -39,7 +39,7 @@ EOF
     fi
 
     echo "Starting MariaDB daemon..."
-    /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql --skip-grant-tables > /var/log/mysql.log 2>&1 &
+    /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql > /var/log/mysql.log 2>&1 &
 
     echo "Waiting for MariaDB to accept connections..."
     READY=0
@@ -52,26 +52,22 @@ EOF
         sleep 1
     done
 
-    # Ensure target database exists
-    mysql -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;" || true
+    if [ "$READY" = "1" ]; then
+        mysql -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;" || true
 
-    TABLES_EXIST=$(mysql -N -s -e "SELECT count(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME';" 2>/dev/null || echo "0")
-    if [ "$TABLES_EXIST" = "0" ] || [ -z "$TABLES_EXIST" ]; then
-        if [ -f "/var/www/html/database_setup.sql" ]; then
-            echo "Importing initial database schema from database_setup.sql..."
-            mysql "$DB_NAME" < /var/www/html/database_setup.sql || true
-            echo "Database import complete!"
+        TABLES_EXIST=$(mysql -N -s -e "SELECT count(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME';" 2>/dev/null || echo "0")
+        if [ "$TABLES_EXIST" = "0" ] || [ -z "$TABLES_EXIST" ]; then
+            if [ -f "/var/www/html/database_setup.sql" ]; then
+                echo "Importing initial database schema from database_setup.sql..."
+                mysql "$DB_NAME" < /var/www/html/database_setup.sql || true
+                echo "Database import complete!"
+            fi
+        else
+            echo "$DB_NAME already contains $TABLES_EXIST tables."
         fi
     else
-        echo "$DB_NAME already contains $TABLES_EXIST tables."
+        echo "Warning: MariaDB did not become ready; continuing so external-db deployments can still start."
     fi
-
-    # Ensure default admin and demo user credentials are confirmed valid
-    mysql "$DB_NAME" -e "
-        UPDATE admins SET password='12345' WHERE username='admin';
-        UPDATE admin SET password='12345' WHERE username='admin';
-        UPDATE users SET password='12345' WHERE email='mohanraj.s4211@gmail.com';
-    " 2>/dev/null || true
 fi
 
 echo "Launching Apache on port ${APACHE_PORT}..."
