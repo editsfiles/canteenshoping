@@ -56,7 +56,6 @@ if(mysqli_stmt_execute($updateStmt)){
 }
 
 }
-?>
 
 $activePage = 'products';
 ?>

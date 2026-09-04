@@ -111,7 +111,6 @@ if ($where != "" && $dateWhere != "") {
 $sql .= " ORDER BY id DESC LIMIT 50";
 
 $latestOrders = mysqli_query($conn, $sql);
-?>
 
 $activePage = 'reports';
 ?>

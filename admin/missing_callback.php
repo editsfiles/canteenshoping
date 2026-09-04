@@ -48,9 +48,10 @@ if (isset($_GET['sync_id'])) {
                 mysqli_stmt_bind_param($upd, "ssi", $bankUtr, $bankUtr, $orderId);
                 mysqli_stmt_execute($upd);
                 mysqli_stmt_close($upd);
-                $message = "<div class='alert success'>✅ Missing Callback Resolved: Order #$orderId is marked as PAID / Completed!</div>";
+                $message = "<div class='alert-material success'><i class='fa-solid fa-circle-check'></i> Missing Callback Resolved: Order #$orderId is marked as PAID / Completed!</div>";
             } else {
-                $message = "<div class='alert warning'>⚠️ Gateway reports status: <strong>$uroStatus</strong> for Order #$orderId. Not yet paid.</div>";
+                $statusText = !empty($uroStatus) ? $uroStatus : "UNRESOLVED / NOT PAID";
+                $message = "<div class='alert-material warning'><i class='fa-solid fa-triangle-exclamation'></i> Gateway reports status: <strong>$statusText</strong> for Order #$orderId. Not yet paid.</div>";
             }
         }
     }
@@ -88,7 +89,7 @@ if (isset($_POST['reconcile_all'])) {
             $reconciledCount++;
         }
     }
-    $message = "<div class='alert success'>⚡ Bulk Callback Sync Completed: <strong>$reconciledCount</strong> missing callback(s) recovered and marked Paid.</div>";
+    $message = "<div class='alert-material success'><i class='fa-solid fa-bolt'></i> Bulk Callback Sync Completed: <strong>$reconciledCount</strong> missing callback(s) recovered and marked Paid.</div>";
 }
 
 // 3. Manual Force Mark as Paid with UTR
@@ -101,7 +102,7 @@ if (isset($_POST['manual_confirm'])) {
         mysqli_stmt_bind_param($stmt, "ssi", $bankUtr, $bankUtr, $orderId);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
-        $message = "<div class='alert success'>✅ Order #$orderId manually confirmed and marked Paid!</div>";
+        $message = "<div class='alert-material success'><i class='fa-solid fa-circle-check'></i> Order #$orderId manually confirmed and marked Paid!</div>";
     }
 }
 
@@ -112,7 +113,7 @@ $pendingOrders = mysqli_query($conn, "SELECT orders.*, users.name as customer_na
 $logFile = "../webhook_log.txt";
 $webhookLogs = file_exists($logFile) ? file_get_contents($logFile) : "No webhook activity recorded yet.";
 $webhookLogs = mb_substr($webhookLogs, -3000); // Last 3KB
-?>
+
 $activePage = 'missing_callback';
 ?>
 <!DOCTYPE html>
