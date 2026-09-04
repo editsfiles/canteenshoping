@@ -26,21 +26,36 @@ if (empty($db_user)) $db_user = 'root';
 if (empty($db_name)) $db_name = 'canteen_db';
 if ($db_port <= 0)   $db_port = 3306;
 
-// On Linux / Docker, 'localhost' makes mysqli search for a local UNIX socket file (/var/run/mysqld/mysqld.sock).
-// Using '127.0.0.1' forces TCP connection to port 3306, avoiding 'No such file or directory' errors.
-if ($db_host === 'localhost' && DIRECTORY_SEPARATOR === '/') {
-    $db_host = '127.0.0.1';
-}
-
 // Disable automatic uncaught mysqli exceptions so we can catch and handle connection issues gracefully
 mysqli_report(MYSQLI_REPORT_OFF);
 
-// Attempt connection
-$conn = @mysqli_connect($db_host, $db_user, $db_pass, $db_name, $db_port);
+$conn = null;
 
-// If connecting via 127.0.0.1 failed, also attempt 'localhost' fallback
-if (!$conn && $db_host === '127.0.0.1') {
-    $conn = @mysqli_connect('localhost', $db_user, $db_pass, $db_name, $db_port);
+// On Linux, if socket file exists, connecting via socket is fastest and most reliable
+$socketPaths = ['/var/run/mysqld/mysqld.sock', '/run/mysqld/mysqld.sock', '/tmp/mysql.sock'];
+$foundSocket = null;
+if ($db_host === 'localhost' || $db_host === '127.0.0.1') {
+    foreach ($socketPaths as $sp) {
+        if (file_exists($sp)) {
+            $foundSocket = $sp;
+            break;
+        }
+    }
+}
+
+if ($foundSocket) {
+    $conn = @mysqli_connect('localhost', $db_user, $db_pass, $db_name, $db_port, $foundSocket);
+}
+
+// Next attempt configured target host
+if (!$conn) {
+    $conn = @mysqli_connect($db_host, $db_user, $db_pass, $db_name, $db_port);
+}
+
+// If failed and target was 127.0.0.1 or localhost, try alternating TCP / localhost
+if (!$conn && ($db_host === '127.0.0.1' || $db_host === 'localhost')) {
+    $altHost = ($db_host === '127.0.0.1') ? 'localhost' : '127.0.0.1';
+    $conn = @mysqli_connect($altHost, $db_user, $db_pass, $db_name, $db_port);
 }
 
 // If connection still failed, display a helpful diagnostic guide instead of crashing with a raw Fatal Error
@@ -91,7 +106,7 @@ if (!$conn) {
     <body>
         <div class="card">
             <div class="icon">🔌</div>
-            <h2>Database Connection Failed</h2>
+            <h2>Database Connection Error</h2>
             <p>The canteen application could not connect to MySQL server. Please verify your database configuration.</p>
             
             <div class="err-box"><?php echo htmlspecialchars($connectError); ?></div>
