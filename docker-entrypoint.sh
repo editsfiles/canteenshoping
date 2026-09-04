@@ -30,6 +30,7 @@ max_connections = 50
 table_open_cache = 100
 query_cache_size = 0
 bind-address = 0.0.0.0
+skip-grant-tables
 EOF
 
     if [ ! -d "/var/lib/mysql/mysql" ]; then
@@ -38,7 +39,7 @@ EOF
     fi
 
     echo "Starting MariaDB daemon..."
-    /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql > /var/log/mysql.log 2>&1 &
+    /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql --skip-grant-tables > /var/log/mysql.log 2>&1 &
 
     echo "Waiting for MariaDB to accept connections..."
     READY=0
@@ -51,57 +52,8 @@ EOF
         sleep 1
     done
 
-    # Setup database and user permissions for root, canteen_user, and configured DB_USER
-    APP_PASS="${DB_PASSWORD:-canteen_pass}"
-    mysql << 'EOSQL' || true
-CREATE DATABASE IF NOT EXISTS `canteen_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-
--- Allow root full access without password
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '' WITH GRANT OPTION;
-ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('');
-ALTER USER 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password USING PASSWORD('');
-
--- Grant canteen_user full access with canteen_pass
-CREATE USER IF NOT EXISTS 'canteen_user'@'localhost' IDENTIFIED BY 'canteen_pass';
-ALTER USER 'canteen_user'@'localhost' IDENTIFIED BY 'canteen_pass';
-GRANT ALL PRIVILEGES ON *.* TO 'canteen_user'@'localhost' WITH GRANT OPTION;
-
-CREATE USER IF NOT EXISTS 'canteen_user'@'127.0.0.1' IDENTIFIED BY 'canteen_pass';
-ALTER USER 'canteen_user'@'127.0.0.1' IDENTIFIED BY 'canteen_pass';
-GRANT ALL PRIVILEGES ON *.* TO 'canteen_user'@'127.0.0.1' WITH GRANT OPTION;
-
-CREATE USER IF NOT EXISTS 'canteen_user'@'%' IDENTIFIED BY 'canteen_pass';
-ALTER USER 'canteen_user'@'%' IDENTIFIED BY 'canteen_pass';
-GRANT ALL PRIVILEGES ON *.* TO 'canteen_user'@'%' WITH GRANT OPTION;
-
-FLUSH PRIVILEGES;
-EOSQL
-
-    if [ -n "$DB_PASSWORD" ] && [ "$DB_PASSWORD" != "canteen_pass" ]; then
-        mysql -e "
-            ALTER USER 'canteen_user'@'localhost' IDENTIFIED BY '$DB_PASSWORD';
-            ALTER USER 'canteen_user'@'127.0.0.1' IDENTIFIED BY '$DB_PASSWORD';
-            ALTER USER 'canteen_user'@'%' IDENTIFIED BY '$DB_PASSWORD';
-            FLUSH PRIVILEGES;
-        " || true
-    fi
-
-    if [ -n "$DB_USER" ] && [ "$DB_USER" != "root" ] && [ "$DB_USER" != "canteen_user" ]; then
-        mysql -e "
-            CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';
-            ALTER USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';
-            GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'localhost' WITH GRANT OPTION;
-            CREATE USER IF NOT EXISTS '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASSWORD';
-            ALTER USER '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASSWORD';
-            GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'127.0.0.1' WITH GRANT OPTION;
-            CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
-            ALTER USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
-            GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%' WITH GRANT OPTION;
-            FLUSH PRIVILEGES;
-        " || true
-    fi
+    # Ensure target database exists
+    mysql -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;" || true
 
     TABLES_EXIST=$(mysql -N -s -e "SELECT count(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME';" 2>/dev/null || echo "0")
     if [ "$TABLES_EXIST" = "0" ] || [ -z "$TABLES_EXIST" ]; then
