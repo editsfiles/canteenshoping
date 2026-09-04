@@ -612,7 +612,7 @@ if ($itemStmt) {
 
 $_SESSION['cart'] = [];
 $_SESSION['payment_status'] = "Pending";
-$_SESSION['payment_expires_at'] = time() + 300; // 5 minutes time limit for QR payment
+$_SESSION['payment_expires_at'] = time() + 600; // 10 minutes time limit for QR payment
 
 
 /* ==============================

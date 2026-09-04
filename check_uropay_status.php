@@ -102,6 +102,7 @@ function findMatchingOrderId($conn, $merchantOrderId = null, $paymentId = null) 
 $uroPayOrderId = trim($_GET['order_id'] ?? ($_SESSION['uropay_order_id'] ?? ''));
 
 if (empty($uroPayOrderId)) {
+    session_write_close();
     echo json_encode([
         "success" => false,
         "message" => "Payment session or order ID not found."
@@ -112,6 +113,10 @@ if (empty($uroPayOrderId)) {
 $_SESSION['uropay_order_id'] = $uroPayOrderId;
 
 $localOrderId = (int)($_SESSION['local_order_id'] ?? 0);
+$merchantOrderId = trim((string)($_SESSION['merchant_order_id'] ?? ''));
+
+// Release session lock early to prevent blocking subsequent polling requests
+session_write_close();
 
 if ($localOrderId <= 0) {
     $stmt = mysqli_prepare($conn, "SELECT id FROM orders WHERE payment_id = ? OR merchant_order_id = ? LIMIT 1");
@@ -129,13 +134,10 @@ if ($localOrderId <= 0) {
 if ($localOrderId <= 0) {
     $localOrderId = findMatchingOrderId(
         $conn,
-        $_SESSION['merchant_order_id'] ?? null,
+        $merchantOrderId,
         $uroPayOrderId
     );
 }
-
-// Release session lock early to prevent blocking subsequent polling requests
-session_write_close();
 
 if ($localOrderId <= 0) {
     echo json_encode([

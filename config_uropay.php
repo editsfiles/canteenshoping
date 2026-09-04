@@ -1,8 +1,8 @@
 <?php
 
 define("UROPAY_API_URL", getenv('UROPAY_API_URL') ?: "https://api.uropay.me");
-define("UROPAY_API_KEY", getenv('UROPAY_API_KEY') ?: "");
-define("UROPAY_SECRET", getenv('UROPAY_SECRET') ?: "");
+define("UROPAY_API_KEY", getenv('UROPAY_API_KEY') ?: "G994K1P445AJ28UL");
+define("UROPAY_SECRET", getenv('UROPAY_SECRET') ?: "XUJCZN35BLV431DUKMBJHX8M3UW3RXMN8ZYMHL7SAUG4WYAPWJ");
 define("CANTEEN_UPI_ID", getenv('CANTEEN_UPI_ID') ?: "canteen@upi");
 
 define("SITE_URL", rtrim(getenv('SITE_URL') ?: 'http://127.0.0.1:8080', '/'));

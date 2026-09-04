@@ -898,8 +898,15 @@ async function checkPayment(isManual = false) {
         }
 
         if (isManual && statusText) {
-            statusText.innerText = "Bank: Pending (Payment not yet detected. If already paid, wait 10s and recheck).";
-            if (statusBox) statusBox.className = "status-box";
+            statusText.innerHTML = "<i class='fa-solid fa-clock-rotate-left'></i> Bank: Pending. If already transferred via UPI app, enter the 12-digit UTR below to confirm!";
+            if (statusBox) statusBox.className = "status-box checking";
+            
+            const utrBox = document.getElementById("manualUtrInput");
+            if (utrBox) {
+                utrBox.style.borderColor = "#16a34a";
+                utrBox.style.boxShadow = "0 0 0 3px rgba(22, 163, 74, 0.35)";
+                utrBox.focus();
+            }
         }
     } catch (error) {
         console.error("Payment check error:", error);
@@ -972,11 +979,11 @@ function startPaymentTracking(trackOrderId) {
         }
     }, 1500); // 1.5 seconds interval ensures instant 2–3 sec detection
 
-    // Safety timeout: stop polling after 4 minutes if user abandons checkout
+    // Safety timeout: 10 minutes matches the order payment window
     setTimeout(() => {
         clearInterval(paymentTimer);
-        console.warn("Payment tracking stopped after 4-minute safety timeout.");
-    }, 240000);
+        console.warn("Payment tracking stopped after 10-minute timeout.");
+    }, 600000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
