@@ -65,6 +65,13 @@ EOF
     else
         echo "$DB_NAME already contains $TABLES_EXIST tables."
     fi
+
+    # Ensure default admin and demo user credentials are confirmed valid
+    mysql "$DB_NAME" -e "
+        UPDATE admins SET password='12345' WHERE username='admin';
+        UPDATE admin SET password='12345' WHERE username='admin';
+        UPDATE users SET password='12345' WHERE email='mohanraj.s4211@gmail.com';
+    " 2>/dev/null || true
 fi
 
 echo "Launching Apache on port ${APACHE_PORT}..."

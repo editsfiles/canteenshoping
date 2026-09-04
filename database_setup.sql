@@ -22,8 +22,8 @@ CREATE TABLE `admins` (
 
 -- Insert default admin: user: admin / pass: 12345 (supports bcrypt & plaintext)
 INSERT INTO `admins` (`id`, `username`, `password`, `created_at`) VALUES
-(1, 'admin', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHeFkV.qjJd3K8sIeL0r1fTjLp6X6/7.kC', NOW())
-ON DUPLICATE KEY UPDATE `username` = 'admin';
+(1, 'admin', '12345', NOW())
+ON DUPLICATE KEY UPDATE `password` = '12345';
 
 -- Compatibility table/alias for legacy 'admin'
 DROP TABLE IF EXISTS `admin`;
@@ -37,8 +37,8 @@ CREATE TABLE `admin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `admin` (`id`, `username`, `password`, `created_at`) VALUES
-(1, 'admin', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHeFkV.qjJd3K8sIeL0r1fTjLp6X6/7.kC', NOW())
-ON DUPLICATE KEY UPDATE `username` = 'admin';
+(1, 'admin', '12345', NOW())
+ON DUPLICATE KEY UPDATE `password` = '12345';
 
 
 -- --------------------------------------------------------
@@ -118,8 +118,8 @@ CREATE TABLE `users` (
 
 -- Demo Student: mohanraj.s4211@gmail.com / pass: 12345
 INSERT INTO `users` (`id`, `name`, `regno`, `department`, `email`, `password`, `created_at`) VALUES
-(1, 'mohanraj', '13562', 'BCA', 'mohanraj.s4211@gmail.com', '$2y$10$DcEyQ.ecFgLveRijmYz4tuCBN3qYODflR7t2GVb4wMXVOObqqnMlK', NOW())
-ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+(1, 'mohanraj', '13562', 'BCA', 'mohanraj.s4211@gmail.com', '12345', NOW())
+ON DUPLICATE KEY UPDATE `password` = '12345';
 
 
 -- --------------------------------------------------------
