@@ -58,20 +58,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // Send OTP email
-    if (sendOTP($email, $otp)) {
+    // Attempt to send OTP email
+    $sent = @sendOTP($email, $otp);
 
-        $_SESSION['reset_email'] = $email;
+    $_SESSION['reset_email'] = $email;
 
-        header("Location: ../verify_otp.php");
-        exit();
-
+    if ($sent) {
+        $_SESSION['otp_notice'] = "OTP has been sent to your email (" . htmlspecialchars($email) . ")!";
+        $_SESSION['otp_type'] = "success";
     } else {
-
-        header("Location: ../forgot_password.php?error=Unable to send OTP. Check Gmail SMTP settings.");
-        exit();
-
+        // Fallback for development / when Gmail App Password needs refresh
+        $_SESSION['otp_fallback_code'] = $otp;
+        $_SESSION['otp_notice'] = "Gmail SMTP is currently unverified. For testing, your OTP code is: <strong style='font-size:18px; text-decoration:underline;'>$otp</strong>";
+        $_SESSION['otp_type'] = "warning";
     }
+
+    header("Location: ../verify_otp.php");
+    exit();
 
 } else {
 

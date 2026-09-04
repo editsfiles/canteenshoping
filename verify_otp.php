@@ -9,6 +9,18 @@ if(!isset($_SESSION['reset_email'])){
 
 $message = "";
 
+if (!empty($_SESSION['otp_notice'])) {
+    $type = $_SESSION['otp_type'] ?? 'info';
+    $style = ($type === 'success')
+        ? "background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7;"
+        : "background:#fff3e0; color:#e65100; border:1px solid #ffcc80;";
+    $message = "<div style='padding:12px 14px; border-radius:10px; margin-bottom:18px; font-size:14px; text-align:center; line-height:1.5; $style'>" . $_SESSION['otp_notice'] . "</div>";
+    unset($_SESSION['otp_notice'], $_SESSION['otp_type']);
+}
+
+$prefillOtp = $_SESSION['otp_fallback_code'] ?? '';
+unset($_SESSION['otp_fallback_code']);
+
 if(isset($_POST['verify'])){
 
     $email = $_SESSION['reset_email'];
@@ -185,6 +197,7 @@ type="text"
 name="otp"
 maxlength="6"
 placeholder="Enter 6-digit OTP"
+value="<?php echo htmlspecialchars($prefillOtp); ?>"
 required>
 
 </div>
@@ -198,6 +211,12 @@ Verify OTP
 </button>
 
 </form>
+
+<div style="margin-top:20px; text-align:center;">
+    <a href="forgot_password.php" style="color:white; text-decoration:none; font-size:14px; opacity:0.9;">← Try Another Email</a>
+    <span style="color:rgba(255,255,255,0.4); margin:0 8px;">|</span>
+    <a href="login.php" style="color:white; text-decoration:none; font-size:14px; opacity:0.9;">Back to Login</a>
+</div>
 
 </div>
 

@@ -13,17 +13,19 @@ function sendOTP($toEmail, $otp)
 
     try {
 
+        $smtpUser = getenv('SMTP_USER') ?: (getenv('GMAIL_USER') ?: 'mohanraj.s4211@gmail.com');
+        $smtpPass = getenv('SMTP_PASSWORD') ?: (getenv('GMAIL_APP_PASSWORD') ?: 'ssib ifjd ifln vcls');
+
         $mail->isSMTP();
-        $mail->Host = "smtp.gmail.com";
+        $mail->Host = getenv('SMTP_HOST') ?: "smtp.gmail.com";
         $mail->SMTPAuth = true;
 
-        $mail->Username = "mohanraj.s4211@gmail.com";
-
-        // Replace with your Gmail App Password
-        $mail->Password = "ssib ifjd ifln vcls";
+        $mail->Username = $smtpUser;
+        $mail->Password = str_replace(' ', '', $smtpPass);
 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+        $mail->Port = (int)(getenv('SMTP_PORT') ?: 587);
+        $mail->Timeout = 10;
 
         $mail->setFrom("mohanraj.s4211@gmail.com", "College Canteen");
         $mail->addAddress($toEmail);
@@ -94,13 +96,17 @@ function sendOrderInvoiceEmail($orderId, $conn)
 
     $mail = new PHPMailer(true);
     try {
+        $smtpUser = getenv('SMTP_USER') ?: (getenv('GMAIL_USER') ?: 'mohanraj.s4211@gmail.com');
+        $smtpPass = getenv('SMTP_PASSWORD') ?: (getenv('GMAIL_APP_PASSWORD') ?: 'ssib ifjd ifln vcls');
+
         $mail->isSMTP();
-        $mail->Host = "smtp.gmail.com";
+        $mail->Host = getenv('SMTP_HOST') ?: "smtp.gmail.com";
         $mail->SMTPAuth = true;
-        $mail->Username = "mohanraj.s4211@gmail.com";
-        $mail->Password = "ssib ifjd ifln vcls";
+        $mail->Username = $smtpUser;
+        $mail->Password = str_replace(' ', '', $smtpPass);
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+        $mail->Port = (int)(getenv('SMTP_PORT') ?: 587);
+        $mail->Timeout = 10;
         $mail->setFrom("mohanraj.s4211@gmail.com", "College Canteen");
         $mail->addAddress($toEmail, $custName);
 
