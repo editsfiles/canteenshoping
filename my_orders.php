@@ -14,6 +14,49 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = (int)$_SESSION['user_id'];
 
+// =========================================================
+// PROCESS ORDER CANCELLATION & 24-48 HR AUTOMATIC REFUND
+// =========================================================
+$cancelMsg = "";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order_id'])) {
+    $cancelOrderId = (int)$_POST['cancel_order_id'];
+
+    $checkStmt = mysqli_prepare($conn, "SELECT id, total_amount, payment_id, status, food_status FROM orders WHERE id = ? AND user_id = ? LIMIT 1");
+    if ($checkStmt) {
+        mysqli_stmt_bind_param($checkStmt, "ii", $cancelOrderId, $user_id);
+        mysqli_stmt_execute($checkStmt);
+        $checkRes = mysqli_stmt_get_result($checkStmt);
+
+        if ($checkRes && $orderToCancel = mysqli_fetch_assoc($checkRes)) {
+            $curStatus = strtolower(trim($orderToCancel['status']));
+            $curFoodStatus = strtolower(trim($orderToCancel['food_status']));
+
+            if ($curStatus === 'cancelled' || $curStatus === 'canceled') {
+                $cancelMsg = "<div class='cancel-alert warning'><i class='fa-solid fa-triangle-exclamation'></i> Order #$cancelOrderId is already cancelled. Refund is processing within 24 to 48 hours.</div>";
+            } elseif ($curFoodStatus === 'delivered') {
+                $cancelMsg = "<div class='cancel-alert danger'><i class='fa-solid fa-circle-xmark'></i> Cannot cancel Order #$cancelOrderId: The food has already been delivered.</div>";
+            } else {
+                $refundNotes = "Order cancelled. Amount ₹" . number_format($orderToCancel['total_amount'], 2) . " will be refunded automatically within 24 to 48 hours.";
+                $upd = mysqli_prepare($conn, "UPDATE orders SET status = 'Cancelled', food_status = 'Cancelled', refund_status = 'Refund Processing (24-48 hrs)', refund_notes = ? WHERE id = ? AND user_id = ?");
+                if ($upd) {
+                    mysqli_stmt_bind_param($upd, "sii", $refundNotes, $cancelOrderId, $user_id);
+                    mysqli_stmt_execute($upd);
+                    mysqli_stmt_close($upd);
+                }
+
+                // Log automatic refund request
+                $logLine = "[" . date('Y-m-d H:i:s') . "] ORDER CANCELLED: Order #" . $cancelOrderId . " | Amount: ₹" . $orderToCancel['total_amount'] . " | Auto-Refund Policy: 24 to 48 Hours\n";
+                @file_put_contents("webhook_log.txt", $logLine, FILE_APPEND);
+
+                $cancelMsg = "<div class='cancel-alert success'>
+                    <h4 style='margin:0 0 6px; font-size:16px;'><i class='fa-solid fa-circle-check'></i> Order #$cancelOrderId Cancelled Successfully</h4>
+                    <p style='margin:0;'>The order has been cancelled. Your amount of <strong>₹" . number_format($orderToCancel['total_amount'], 2) . "</strong> will be <strong>refunded automatically within 24 to 48 hours</strong> to your original payment method / UPI account.</p>
+                </div>";
+            }
+        }
+        mysqli_stmt_close($checkStmt);
+    }
+}
 
 // =========================================================
 // GET ORDERS
@@ -83,7 +126,7 @@ foreach ($possibleDateColumns as $column) {
 <title>My Orders</title>
 
 <link rel="stylesheet" href="css/style.css">
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
 
 <style>
 
@@ -124,6 +167,57 @@ foreach ($possibleDateColumns as $column) {
     box-shadow:
         0 5px 10px rgba(52, 152, 219, 0.25);
 
+}
+
+.cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 13px;
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    white-space: nowrap;
+}
+
+.cancel-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+}
+
+.cancel-alert {
+    padding: 16px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.cancel-alert.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.cancel-alert.warning {
+    background: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.cancel-alert.danger {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
 }
 
 
@@ -192,6 +286,7 @@ foreach ($possibleDateColumns as $column) {
 
 <div class="container">
 
+<?php if (!empty($cancelMsg)) echo $cancelMsg; ?>
 
 <?php
 
@@ -256,6 +351,8 @@ if (mysqli_num_rows($result) == 0) {
     <th>Date</th>
 
     <th>Invoice</th>
+
+    <th>Action</th>
 
 </tr>
 
@@ -502,12 +599,14 @@ while ($row = mysqli_fetch_assoc($result)) {
     <td>
 
         <span class="status <?php echo $class; ?>">
-
-            <?php
-            echo htmlspecialchars($status);
-            ?>
-
+            <?php echo htmlspecialchars($status); ?>
         </span>
+
+        <?php if (in_array(strtolower(trim($status)), ['cancelled', 'canceled', 'failed'], true)): ?>
+            <div style="font-size:11px; color:#b91c1c; font-weight:700; margin-top:5px; line-height:1.3;">
+                <i class="fa-solid fa-clock-rotate-left"></i> Refund in 24-48 hrs
+            </div>
+        <?php endif; ?>
 
     </td>
 
@@ -577,6 +676,37 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         <?php } ?>
 
+    </td>
+
+
+    <!-- =================================================
+         ACTION / CANCEL ORDER & 24-48 HR REFUND
+         ================================================= -->
+
+    <td>
+        <?php 
+        $foodSt = strtolower(trim($row['food_status'] ?? ''));
+        $orderSt = strtolower(trim($status));
+        $isCancelled = in_array($orderSt, ['cancelled', 'canceled', 'failed'], true);
+        $isDelivered = ($foodSt === 'delivered');
+        ?>
+
+        <?php if ($isCancelled): ?>
+            <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#b91c1c; font-weight:600; padding:5px 10px; background:#fee2e2; border-radius:6px; border:1px solid #fecaca; white-space:nowrap;">
+                <i class="fa-solid fa-rotate-left"></i> Auto-Refund Initiated
+            </span>
+        <?php elseif (!$isDelivered): ?>
+            <form method="POST" style="margin:0; display:inline;" onsubmit="return confirm('Cancel Order #<?php echo $orderId; ?>?\n\nIf you have already paid, the total amount of ₹<?php echo number_format($totalAmount, 2); ?> will be refunded automatically to your original UPI / Bank account within 24 to 48 hours.');">
+                <input type="hidden" name="cancel_order_id" value="<?php echo $orderId; ?>">
+                <button type="submit" class="cancel-btn" title="Cancel order and trigger automatic 24-48 hr refund">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                </button>
+            </form>
+        <?php else: ?>
+            <span style="font-size:12px; color:#15803d; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                <i class="fa-solid fa-circle-check"></i> Delivered
+            </span>
+        <?php endif; ?>
     </td>
 
 

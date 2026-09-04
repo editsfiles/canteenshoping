@@ -53,7 +53,8 @@ if (isset($_POST['update'])) {
     $allowedFoodStatus = [
         'Preparing',
         'Ready',
-        'Delivered'
+        'Delivered',
+        'Cancelled'
     ];
 
     $allowedPaymentStatus = [
@@ -64,11 +65,21 @@ if (isset($_POST['update'])) {
 
     if ($id > 0 && in_array($foodStatus, $allowedFoodStatus, true)) {
         if (!empty($paymentStatus) && in_array($paymentStatus, $allowedPaymentStatus, true)) {
-            $stmt = mysqli_prepare($conn, "UPDATE orders SET food_status = ?, status = ? WHERE id = ?");
-            if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "ssi", $foodStatus, $paymentStatus, $id);
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
+            if ($paymentStatus === 'Cancelled' || $foodStatus === 'Cancelled') {
+                $refNote = "Cancelled by Admin. Automatic refund of paid amount processed within 24 to 48 hours.";
+                $stmt = mysqli_prepare($conn, "UPDATE orders SET food_status = ?, status = ?, refund_status = 'Refund Processing (24-48 hrs)', refund_notes = ? WHERE id = ?");
+                if ($stmt) {
+                    mysqli_stmt_bind_param($stmt, "sssi", $foodStatus, $paymentStatus, $refNote, $id);
+                    mysqli_stmt_execute($stmt);
+                    mysqli_stmt_close($stmt);
+                }
+            } else {
+                $stmt = mysqli_prepare($conn, "UPDATE orders SET food_status = ?, status = ? WHERE id = ?");
+                if ($stmt) {
+                    mysqli_stmt_bind_param($stmt, "ssi", $foodStatus, $paymentStatus, $id);
+                    mysqli_stmt_execute($stmt);
+                    mysqli_stmt_close($stmt);
+                }
             }
         } else {
             $stmt = mysqli_prepare($conn, "UPDATE orders SET food_status = ? WHERE id = ?");
@@ -408,6 +419,11 @@ if (!$result) {
                                     <i class="fa-solid fa-circle-xmark"></i> <?php echo htmlspecialchars($status); ?>
                                 <?php endif; ?>
                             </span>
+                            <?php if (strtolower($status) === 'cancelled' || strtolower($status) === 'canceled'): ?>
+                                <div style="font-size:11px; color:#b91c1c; font-weight:700; margin-top:3px; line-height:1.2;">
+                                    <i class="fa-solid fa-rotate-left"></i> Auto-Refund (24-48 hrs)
+                                </div>
+                            <?php endif; ?>
                         </td>
 
                         <!-- FOOD STATUS -->

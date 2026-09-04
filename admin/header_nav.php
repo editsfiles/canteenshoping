@@ -14,7 +14,7 @@ if (!isset($activePage)) {
 <header class="admin-top-nav">
     <a href="dashboard.php" class="admin-logo">
         <i class="fa-solid fa-utensils"></i>
-        <span>College Canteen Admin</span>
+        <span>CanteenAdmin</span>
     </a>
 
     <nav class="admin-menu">
@@ -39,49 +39,19 @@ if (!isset($activePage)) {
         <a href="messages.php" class="<?php echo in_array($activePage, ['messages', 'view_message']) ? 'active' : ''; ?>">
             <i class="fa-solid fa-envelope"></i> Messages
         </a>
+        <span class="nav-status-badge" title="Live Canteen System Online">
+            <i class="fa-solid fa-circle" style="font-size:8px; color:#34d399;"></i> Live
+        </span>
+
+       <br> <span class="nav-live-clock" title="Real-time Indian Standard Time (IST)">
+            <i class="fa-regular fa-clock" style="color:#67e8f9;"></i> <span id="adminLiveClock"><?php echo date('h:i:s A'); ?> IST</span>
+        </span>
+
         <a href="logout.php" class="logout-btn">
             <i class="fa-solid fa-right-from-bracket"></i> Logout
         </a>
     </nav>
 </header>
-
-<!-- DARK BAR WITH ICONS & REAL-TIME INDIAN STANDARD TIME (IST) (Directly Below Top Nav) -->
-<div class="admin-dark-bar">
-    <div class="dark-bar-links">
-        <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#64748b; margin-right:4px;">Quick Access:</span>
-        <a href="dashboard.php" class="dark-icon-btn <?php echo $activePage === 'dashboard' ? 'active' : ''; ?>" title="Dashboard Overview">
-            <i class="fa-solid fa-gauge-high"></i>
-        </a>
-        <a href="products.php" class="dark-icon-btn <?php echo in_array($activePage, ['products', 'add_product', 'edit_product']) ? 'active' : ''; ?>" title="Manage Products">
-            <i class="fa-solid fa-burger"></i>
-        </a>
-        <a href="customers.php" class="dark-icon-btn <?php echo in_array($activePage, ['customers', 'customer_details']) ? 'active' : ''; ?>" title="Customer Accounts">
-            <i class="fa-solid fa-user-group"></i>
-        </a>
-        <a href="orders.php" class="dark-icon-btn <?php echo $activePage === 'orders' ? 'active' : ''; ?>" title="Live Orders">
-            <i class="fa-solid fa-bell-concierge"></i>
-        </a>
-        <a href="missing_callback.php" class="dark-icon-btn <?php echo $activePage === 'missing_callback' ? 'active' : ''; ?>" title="Callback Recovery">
-            <i class="fa-solid fa-rotate"></i>
-        </a>
-        <a href="reports.php" class="dark-icon-btn <?php echo $activePage === 'reports' ? 'active' : ''; ?>" title="Financial Reports">
-            <i class="fa-solid fa-file-invoice-dollar"></i>
-        </a>
-        <a href="messages.php" class="dark-icon-btn <?php echo in_array($activePage, ['messages', 'view_message']) ? 'active' : ''; ?>" title="Customer Messages">
-            <i class="fa-solid fa-comments"></i>
-        </a>
-    </div>
-    
-    <div class="dark-bar-status">
-        <span class="dark-bar-badge">
-            <i class="fa-solid fa-circle" style="font-size:8px;"></i> Live Canteen System
-        </span>
-        <span class="dark-bar-time" title="Real-time Indian Standard Time (IST)">
-            <i class="fa-regular fa-clock" style="color:#38bdf8;"></i>
-            <span id="adminLiveClock"><?php echo date('h:i:s A'); ?> IST</span>
-        </span>
-    </div>
-</div>
 
 <script>
 // Real-time ticking Indian Standard Time (IST) Clock

@@ -694,6 +694,16 @@ body {
 
 <div class="invoice-body">
 
+<?php if ($statusClass === 'cancelled' || strtolower($status) === 'cancelled') { ?>
+<div style="background:#fee2e2; border-left:5px solid #ef4444; border-radius:8px; padding:16px 20px; margin-bottom:25px; color:#991b1b;">
+    <h4 style="margin:0 0 6px; font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px;">
+        ⚠️ Order Cancelled - Automatic Refund Policy Active
+    </h4>
+    <p style="margin:0; font-size:14px; line-height:1.5;">
+        This order has been cancelled. The total amount of <strong>₹<?php echo number_format($totalAmount, 2); ?></strong> will be <strong>refunded automatically within 24 to 48 hours</strong> directly to your original payment method / UPI account.
+    </p>
+</div>
+<?php } ?>
 
 <!-- ORDER INFORMATION -->
 

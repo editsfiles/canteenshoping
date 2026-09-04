@@ -64,7 +64,7 @@ $activePage = 'dashboard';
             <h1 class="admin-page-title">
                 <i class="fa-solid fa-gauge-high"></i> Dashboard Overview
             </h1>
-            <p class="admin-subtitle">Live analytics & order management for College Canteen</p>
+            <p class="admin-subtitle">Live analytics & order management for Canteen</p>
         </div>
         <div>
             <a href="orders.php" class="btn-material btn-orange">
@@ -184,6 +184,11 @@ $activePage = 'dashboard';
                                         <i class="fa-solid fa-circle-xmark"></i> <?php echo htmlspecialchars($status); ?>
                                     <?php endif; ?>
                                 </span>
+                                <?php if (strtolower($status) === 'cancelled' || strtolower($status) === 'canceled'): ?>
+                                    <div style="font-size:11px; color:#b91c1c; font-weight:700; margin-top:3px; line-height:1.2;">
+                                        <i class="fa-solid fa-rotate-left"></i> Auto-Refund: 24-48 hrs
+                                    </div>
+                                <?php endif; ?>
                             </td>
                             <td style="color:#64748b; font-size:13px;">
                                 <?php echo htmlspecialchars($row['order_date']); ?>
