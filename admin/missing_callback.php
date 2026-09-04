@@ -113,72 +113,56 @@ $logFile = "../webhook_log.txt";
 $webhookLogs = file_exists($logFile) ? file_get_contents($logFile) : "No webhook activity recorded yet.";
 $webhookLogs = mb_substr($webhookLogs, -3000); // Last 3KB
 ?>
+$activePage = 'missing_callback';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Missing Callback & Reconcile - Canteen Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-body { background: #f1f5f9; color: #1e293b; padding-bottom: 50px; }
-header { background: #1e293b; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-header h2 { font-size: 20px; font-weight: 700; }
-nav a { color: #cbd5e1; text-decoration: none; margin-left: 18px; font-size: 14px; font-weight: 500; }
-nav a:hover, nav a.active { color: white; }
-.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-.card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
-.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
-.card-header h3 { font-size: 18px; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; border: none; transition: 0.2s; }
-.btn-primary { background: #2563eb; color: white; }
-.btn-primary:hover { background: #1d4ed8; }
-.btn-success { background: #16a34a; color: white; }
-.btn-success:hover { background: #15803d; }
-.alert { padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; }
-.alert.success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-.alert.warning { background: #fef3c7; color: #854d0e; border: 1px solid #fde68a; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { padding: 12px 14px; text-align: left; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
-th { background: #f8fafc; color: #64748b; font-weight: 600; }
-.badge-pending { background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-.log-box { background: #0f172a; color: #38bdf8; font-family: monospace; font-size: 12px; padding: 16px; border-radius: 12px; max-height: 250px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missing Callback & Reconcile - College Canteen Admin</title>
+    <!-- Material Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+    <!-- Standardized Admin Material CSS -->
+    <link rel="stylesheet" href="css/admin_material.css">
 </head>
 <body>
 
-<header>
-    <h2>🍽 College Canteen Admin</h2>
-    <nav>
-        <a href="dashboard.php">Dashboard</a>
-        <a href="products.php">Products</a>
-        <a href="customers.php">Customers</a>
-        <a href="orders.php">Orders</a>
-        <a href="missing_callback.php" class="active">Missing Callback</a>
-        <a href="reports.php">Reports</a>
-        <a href="messages.php">Messages</a>
-        <a href="logout.php">Logout</a>
-    </nav>
-</header>
+<?php include("header_nav.php"); ?>
 
-<div class="container">
-    <?php echo $message; ?>
+<div class="admin-container">
+    <div class="admin-header-row">
+        <div>
+            <h1 class="admin-page-title"><i class="fa-solid fa-bolt"></i> Missing Callback Recovery</h1>
+            <p class="admin-subtitle">Reconcile pending payment transactions and force sync with UroPay Gateway</p>
+        </div>
+        <form method="POST" style="margin:0;">
+            <button type="submit" name="reconcile_all" class="btn-material btn-primary">
+                <i class="fa-solid fa-arrows-rotate"></i> Auto-Sync All Gateway Callbacks
+            </button>
+        </form>
+    </div>
 
-    <!-- PENDING CALLBACKS CARD -->
-    <div class="card">
-        <div class="card-header">
-            <h3><i class="fa-solid fa-clock-rotate-left" style="color:#d97706;"></i> Unconfirmed / Pending Orders (Missing Callback Recovery)</h3>
-            <form method="POST" style="margin:0;">
-                <button type="submit" name="reconcile_all" class="btn btn-primary">
-                    <i class="fa-solid fa-arrows-rotate"></i> Auto-Fetch All Gateway Callbacks
-                </button>
-            </form>
+    <?php if (!empty($message)): ?>
+        <div style="margin-bottom: 20px;">
+            <?php echo $message; ?>
+        </div>
+    <?php endif; ?>
+
+    <!-- PENDING CALLBACKS TABLE CARD -->
+    <div class="table-card">
+        <div style="padding: 18px 24px; border-bottom: 1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-clock-rotate-left" style="color:#d97706;"></i> Unconfirmed / Pending Orders
+            </h3>
+            <span style="font-size:13px; color:#64748b; font-weight:600;">
+                Pending count: <?php echo mysqli_num_rows($pendingOrders); ?>
+            </span>
         </div>
 
-        <?php if ($pendingOrders && mysqli_num_rows($pendingOrders) > 0): ?>
-            <table>
+        <div class="table-responsive">
+            <table class="material-table">
                 <thead>
                     <tr>
                         <th>Order ID</th>
@@ -191,44 +175,60 @@ th { background: #f8fafc; color: #64748b; font-weight: 600; }
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($o = mysqli_fetch_assoc($pendingOrders)): ?>
+                    <?php if ($pendingOrders && mysqli_num_rows($pendingOrders) > 0): ?>
+                        <?php while ($o = mysqli_fetch_assoc($pendingOrders)): ?>
+                            <tr>
+                                <td><strong>#<?php echo $o['id']; ?></strong></td>
+                                <td>
+                                    <div style="font-weight:600; color:#0f172a;"><?php echo htmlspecialchars($o['customer_name'] ?? 'N/A'); ?></div>
+                                    <small style="color:#64748b; font-size:12px;"><?php echo htmlspecialchars($o['customer_email'] ?? ''); ?></small>
+                                </td>
+                                <td><strong style="color:#ea580c; font-size:15px;">₹<?php echo number_format((float)$o['total_amount'], 2); ?></strong></td>
+                                <td><code style="background:#f1f5f9; padding:3px 8px; border-radius:6px; font-size:12px; color:#0369a1;"><?php echo htmlspecialchars($o['payment_id'] ?: ($o['merchant_order_id'] ?? 'N/A')); ?></code></td>
+                                <td><?php echo date("d M Y, h:i A", strtotime($o['order_date'])); ?></td>
+                                <td>
+                                    <span class="badge-status badge-pending">
+                                        <i class="fa-regular fa-clock"></i> Pending
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <a href="missing_callback.php?sync_id=<?php echo $o['id']; ?>" class="btn-material btn-primary" style="padding:6px 12px; font-size:12px;" title="Query Gateway Status">
+                                            <i class="fa-solid fa-bolt"></i> Check Gateway
+                                        </a>
+                                        <form method="POST" style="display:inline; margin:0;">
+                                            <input type="hidden" name="order_id" value="<?php echo $o['id']; ?>">
+                                            <button type="submit" name="manual_confirm" class="btn-material btn-success" style="padding:6px 12px; font-size:12px;" onclick="return confirm('Force confirm Order #<?php echo $o['id']; ?> as PAID?');">
+                                                <i class="fa-solid fa-check"></i> Force Paid
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
                         <tr>
-                            <td><strong>#<?php echo $o['id']; ?></strong></td>
-                            <td><?php echo htmlspecialchars($o['customer_name'] ?? 'N/A'); ?></td>
-                            <td><strong>₹<?php echo number_format((float)$o['total_amount'], 2); ?></strong></td>
-                            <td><code><?php echo htmlspecialchars($o['payment_id'] ?? 'N/A'); ?></code></td>
-                            <td><?php echo date("d M Y, h:i A", strtotime($o['order_date'])); ?></td>
-                            <td><span class="badge-pending">Pending</span></td>
-                            <td style="display:flex;gap:6px;">
-                                <a href="missing_callback.php?sync_id=<?php echo $o['id']; ?>" class="btn btn-primary" style="padding:6px 12px;font-size:12px;">
-                                    <i class="fa-solid fa-bolt"></i> Check Gateway
-                                </a>
-                                <form method="POST" style="display:inline;margin:0;">
-                                    <input type="hidden" name="order_id" value="<?php echo $o['id']; ?>">
-                                    <button type="submit" name="manual_confirm" class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Force confirm Order #<?php echo $o['id']; ?> as PAID?');">
-                                        <i class="fa-solid fa-check"></i> Force Paid
-                                    </button>
-                                </form>
+                            <td colspan="7" style="text-align:center; padding:35px 20px; color:#64748b;">
+                                <i class="fa-solid fa-circle-check" style="color:#16a34a; font-size:32px; display:block; margin-bottom:10px;"></i>
+                                <strong style="font-size:16px; color:#0f172a;">All Orders Reconciled!</strong>
+                                <p style="margin-top:4px; font-size:13px;">No pending callbacks found. All active orders are up to date.</p>
                             </td>
                         </tr>
-                    <?php endwhile; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
-        <?php else: ?>
-            <p style="color:#64748b;font-size:14px;padding:20px 0;text-align:center;">
-                <i class="fa-solid fa-circle-check" style="color:#16a34a;font-size:24px;display:block;margin-bottom:8px;"></i>
-                All orders are fully reconciled! No pending callbacks found.
-            </p>
-        <?php endif; ?>
+        </div>
     </div>
 
-    <!-- RECENT WEBHOOK LOGS CARD -->
-    <div class="card">
-        <div class="card-header">
-            <h3><i class="fa-solid fa-terminal" style="color:#2563eb;"></i> Live Webhook Activity Logs</h3>
-            <span style="font-size:12px;color:#64748b;">Stored in webhook_log.txt</span>
+    <!-- LIVE WEBHOOK LOGS -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">
+                <i class="fa-solid fa-terminal" style="color:#0284c7;"></i> Live Webhook Activity Logs
+            </h3>
+            <span style="font-size:12px; color:#64748b;"><i class="fa-regular fa-file-lines"></i> webhook_log.txt (Last 3KB)</span>
         </div>
-        <div class="log-box"><?php echo htmlspecialchars($webhookLogs); ?></div>
+        <div class="log-terminal"><?php echo htmlspecialchars($webhookLogs); ?></div>
     </div>
 </div>
 

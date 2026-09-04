@@ -39,113 +39,83 @@ mysqli_stmt_close($stmt);
 }
 ?>
 
+$activePage = 'products';
+?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-<title>Add Product</title>
-
-<link rel="stylesheet" href="../css/style.css">
-
-<style>
-
-body{
-font-family:Arial;
-background:#f5f5f5;
-}
-
-.container{
-width:500px;
-margin:40px auto;
-background:white;
-padding:20px;
-box-shadow:0 0 10px gray;
-}
-
-input,textarea,select{
-width:100%;
-padding:10px;
-margin:10px 0;
-}
-
-button{
-background:green;
-color:white;
-padding:10px;
-width:100%;
-border:none;
-cursor:pointer;
-}
-
-a{
-text-decoration:none;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Product - College Canteen Admin</title>
+    <!-- Material Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+    <!-- Standardized Admin Material CSS -->
+    <link rel="stylesheet" href="css/admin_material.css">
 </head>
-
 <body>
 
-<div class="container">
+<?php include("header_nav.php"); ?>
 
-<h2>Add Product</h2>
+<div class="admin-container" style="max-width: 680px;">
+    <div class="admin-header-row">
+        <div>
+            <h1 class="admin-page-title"><i class="fa-solid fa-plus-circle"></i> Add New Product</h1>
+            <p class="admin-subtitle">Create and publish a new delicious item to the canteen menu</p>
+        </div>
+        <a href="products.php" class="btn-material" style="background:#e2e8f0; color:#334155;">
+            <i class="fa-solid fa-arrow-left"></i> Back to Products
+        </a>
+    </div>
 
-<form method="POST" enctype="multipart/form-data">
+    <?php if (!empty($message)): ?>
+        <div class="alert-material <?php echo strpos($message, 'Successfully') !== false ? 'success' : 'danger'; ?>">
+            <i class="fa-solid <?php echo strpos($message, 'Successfully') !== false ? 'fa-circle-check' : 'fa-triangle-exclamation'; ?>"></i>
+            <span><?php echo htmlspecialchars($message); ?></span>
+        </div>
+    <?php endif; ?>
 
-<input
-type="text"
-name="product_name"
-placeholder="Product Name"
-required>
+    <div class="admin-card">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-burger"></i> Product Name *</label>
+                <input type="text" name="product_name" class="form-control" placeholder="e.g. Crispy Veg Burger" required>
+            </div>
 
-<textarea
-name="description"
-placeholder="Description"
-required></textarea>
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-align-left"></i> Description *</label>
+                <textarea name="description" class="form-control" placeholder="Describe ingredients, taste, or portion size..." required></textarea>
+            </div>
 
-<input
-type="number"
-name="price"
-placeholder="Price"
-step="0.01"
-required>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                <div class="form-group">
+                    <label class="form-label"><i class="fa-solid fa-indian-rupee-sign"></i> Price (₹) *</label>
+                    <input type="number" name="price" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+                </div>
 
-<select name="status">
+                <div class="form-group">
+                    <label class="form-label"><i class="fa-solid fa-toggle-on"></i> Availability Status *</label>
+                    <select name="status" class="form-control">
+                        <option value="Available">Available</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                    </select>
+                </div>
+            </div>
 
-<option>Available</option>
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-image"></i> Product Image *</label>
+                <input type="file" name="image" class="form-control" accept="image/*" required>
+                <small style="color:#64748b; font-size:12px; margin-top:4px; display:block;">Supported formats: JPG, PNG, WEBP (Square images work best).</small>
+            </div>
 
-<option>Out of Stock</option>
-
-</select>
-
-<input
-type="file"
-name="image"
-required>
-
-<button
-type="submit"
-name="add">
-
-Add Product
-
-</button>
-
-</form>
-
-<br>
-
-<a href="products.php">
-
-← Back to Products
-
-</a>
-
-<h3 style="color:green;">
-<?php echo $message; ?>
-</h3>
-
+            <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:28px;">
+                <a href="products.php" class="btn-material" style="background:#e2e8f0; color:#334155;">Cancel</a>
+                <button type="submit" name="add" class="btn-material btn-orange" style="padding:10px 24px; font-size:14px;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Save & Publish Product
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 </body>

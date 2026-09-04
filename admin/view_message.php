@@ -21,141 +21,82 @@ if(mysqli_num_rows($result)==0){
 }
 
 $row=mysqli_fetch_assoc($result);
+$activePage = 'messages';
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-<meta charset="UTF-8">
-<title>View Message</title>
-
-<style>
-body{
-    margin:0;
-    padding:0;
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-    background:linear-gradient(135deg,#eef2f7,#dfe9f3);
-}
-
-.container{
-    width:700px;
-    margin:50px auto;
-    background:#ffffff;
-    border-radius:18px;
-    padding:35px;
-    box-shadow:0 12px 30px rgba(0,0,0,.18);
-}
-
-h2{
-    margin:0 0 30px;
-    color:#2c3e50;
-    font-size:34px;
-    border-bottom:3px solid #6a11cb;
-    padding-bottom:12px;
-}
-
-.info{
-    margin-bottom:18px;
-    font-size:18px;
-    line-height:30px;
-}
-
-.info strong{
-    color:#6a11cb;
-    display:inline-block;
-    width:110px;
-}
-
-.message-box{
-    background:#f8f9ff;
-    border-left:6px solid #6a11cb;
-    padding:20px;
-    border-radius:10px;
-    margin:20px 0;
-    color:#333;
-    line-height:28px;
-}
-
-.date{
-    color:#666;
-    font-size:16px;
-    margin-top:20px;
-}
-
-.back{
-    display:inline-block;
-    margin-top:30px;
-    background:linear-gradient(90deg,#6a11cb,#2575fc);
-    color:white;
-    text-decoration:none;
-    padding:14px 28px;
-    border-radius:8px;
-    font-size:17px;
-    font-weight:bold;
-    transition:.3s;
-}
-
-.back:hover{
-    transform:translateY(-3px);
-    box-shadow:0 8px 20px rgba(37,117,252,.4);
-}
-
-@media(max-width:768px){
-
-.container{
-    width:90%;
-    padding:25px;
-}
-
-h2{
-    font-size:28px;
-}
-
-.info strong{
-    width:90px;
-}
-
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Message #<?php echo $row['id']; ?> - College Canteen Admin</title>
+    <!-- Material Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+    <!-- Standardized Admin Material CSS -->
+    <link rel="stylesheet" href="css/admin_material.css">
 </head>
-
 <body>
 
-<div class="container">
+<?php include("header_nav.php"); ?>
 
-<h2>📩 Contact Message</h2>
+<div class="admin-container" style="max-width: 860px;">
+    <div class="admin-header-row">
+        <div>
+            <h1 class="admin-page-title"><i class="fa-solid fa-envelope-open"></i> View Inquiry #<?php echo $row['id']; ?></h1>
+            <p class="admin-subtitle">Submitted on <?php echo date("d M Y \a\\t h:i A", strtotime($row['created_at'])); ?></p>
+        </div>
+        <a href="messages.php" class="btn-material" style="background:#e2e8f0; color:#334155;">
+            <i class="fa-solid fa-arrow-left"></i> Back to Messages
+        </a>
+    </div>
 
-<div class="info">
-<strong>Name:</strong>
-<?php echo htmlspecialchars($row['name']); ?>
-</div>
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">
+                <i class="fa-solid fa-circle-info" style="color:#0284c7;"></i> Message Details
+            </h3>
+            <span style="font-size:12px; color:#64748b;">
+                <i class="fa-regular fa-clock"></i> <?php echo date("d M Y, h:i A", strtotime($row['created_at'])); ?>
+            </span>
+        </div>
 
-<div class="info">
-<strong>Email:</strong>
-<?php echo htmlspecialchars($row['email']); ?>
-</div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-bottom:24px;">
+            <div style="background:#f8fafc; padding:16px; border-radius:12px; border:1px solid #e2e8f0;">
+                <span class="form-label" style="margin-bottom:4px;"><i class="fa-solid fa-user"></i> Sender Name</span>
+                <strong style="font-size:16px; color:#0f172a;"><?php echo htmlspecialchars($row['name']); ?></strong>
+            </div>
+            <div style="background:#f8fafc; padding:16px; border-radius:12px; border:1px solid #e2e8f0;">
+                <span class="form-label" style="margin-bottom:4px;"><i class="fa-solid fa-envelope"></i> Email Address</span>
+                <a href="mailto:<?php echo htmlspecialchars($row['email']); ?>" style="font-size:15px; color:#0284c7; text-decoration:none; font-weight:600;">
+                    <?php echo htmlspecialchars($row['email']); ?>
+                </a>
+            </div>
+        </div>
 
-<div class="info">
-<strong>Subject:</strong>
-<?php echo htmlspecialchars($row['subject']); ?>
-</div>
+        <div style="margin-bottom: 24px;">
+            <span class="form-label"><i class="fa-solid fa-heading"></i> Subject</span>
+            <div style="background:#fff7ed; border-left:4px solid #ea580c; padding:14px 18px; border-radius:8px; font-weight:600; color:#c2410c; font-size:16px;">
+                <?php echo htmlspecialchars($row['subject']); ?>
+            </div>
+        </div>
 
-<div class="message-box">
-<strong>Message</strong><br><br>
-<?php echo nl2br(htmlspecialchars($row['message'])); ?>
-</div>
+        <div style="margin-bottom: 28px;">
+            <span class="form-label"><i class="fa-solid fa-comment-dots"></i> Message Content</span>
+            <div style="background:#ffffff; border:1.5px solid #e2e8f0; padding:22px; border-radius:12px; font-size:15px; line-height:1.7; color:#334155; min-height:140px; white-space:pre-wrap;">
+                <?php echo htmlspecialchars($row['message']); ?>
+            </div>
+        </div>
 
-<div class="date">
-<strong>Date:</strong>
-<?php echo $row['created_at']; ?>
-</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f5f9; padding-top:20px; flex-wrap:wrap; gap:12px;">
+            <a href="mailto:<?php echo htmlspecialchars($row['email']); ?>?subject=Re: <?php echo rawurlencode($row['subject']); ?>" class="btn-material btn-primary">
+                <i class="fa-solid fa-reply"></i> Reply via Email
+            </a>
 
-<a href="messages.php" class="back">
-← Back to Messages
-</a>
+            <a href="delete_message.php?id=<?php echo $row['id']; ?>" class="btn-material btn-danger" onclick="return confirm('Are you sure you want to permanently delete this message?');">
+                <i class="fa-solid fa-trash"></i> Delete Message
+            </a>
+        </div>
+    </div>
 </div>
 
 </body>

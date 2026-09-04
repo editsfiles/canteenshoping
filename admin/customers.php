@@ -18,422 +18,126 @@ if (isset($_GET['delete'])) {
         mysqli_query($conn, "DELETE FROM users WHERE id='$id'");
     }
 
-    echo "<script>
-    alert('Customer Deleted Successfully');
-    window.location='customers.php';
-    </script>";
+    header("Location: customers.php");
     exit();
 }
 
 // Search
 $search = "";
-
-if(isset($_GET['search'])){
-    $search = mysqli_real_escape_string($conn,$_GET['search']);
-
-    $query = mysqli_query($conn,"
-    SELECT * FROM users
-    WHERE
-    name LIKE '%$search%'
-    OR regno LIKE '%$search%'
-    OR department LIKE '%$search%'
-    OR email LIKE '%$search%'
-    ORDER BY id DESC
+if (isset($_GET['search']) && trim($_GET['search']) != "") {
+    $search = mysqli_real_escape_string($conn, trim($_GET['search']));
+    $query = mysqli_query($conn, "
+        SELECT * FROM users
+        WHERE name LIKE '%$search%'
+           OR regno LIKE '%$search%'
+           OR department LIKE '%$search%'
+           OR email LIKE '%$search%'
+        ORDER BY id DESC
     ");
-
-}else{
-
-    $query = mysqli_query($conn,"
-    SELECT * FROM users
-    ORDER BY id DESC
-    ");
-
+} else {
+    $query = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
 }
-?>
 
+$activePage = 'customers';
+?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Customers</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-}
-
-body{
-background:#eef2f7;
-}
-
-header{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-padding:18px 20px;
-
-background:linear-gradient(90deg,#6a11cb,#2575fc);
-
-color:#fff;
-
-}
-
-header h2{
-font-size:25px;
-}
-
-header nav a{
-
-color:white;
-text-decoration:none;
-margin-left:30px;
-font-size:22px;
-font-weight:300;
-
-}
-
-header nav a:hover{
-color:#ffe082;
-}
-
-.container{
-
-width:95%;
-margin:40px auto;
-
-}
-
-.title{
-
-font-size:46px;
-font-weight:bold;
-
-color:#2c3e50;
-
-margin-bottom:30px;
-
-}
-
-.search-box{
-
-display:flex;
-width:420px;
-
-margin-bottom:30px;
-
-}
-
-.search-box input{
-
-flex:1;
-
-padding:15px;
-
-font-size:18px;
-
-border:2px solid #6a11cb;
-
-border-right:none;
-
-border-radius:8px 0 0 8px;
-
-outline:none;
-
-}
-
-.search-box button{
-
-width:130px;
-
-background:#6a11cb;
-
-color:white;
-
-border:none;
-
-font-size:18px;
-
-cursor:pointer;
-
-border-radius:0 8px 8px 0;
-
-}
-
-.search-box button:hover{
-
-background:#4e0fa3;
-
-}
-
-table{
-
-width:100%;
-
-border-collapse:collapse;
-
-background:white;
-
-border-radius:10px;
-
-overflow:hidden;
-
-box-shadow:0 10px 25px rgba(0,0,0,.15);
-
-}
-
-th{
-
-padding:18px;
-
-background:linear-gradient(90deg,#ff512f,#dd2476);
-
-color:white;
-
-font-size:20px;
-
-}
-
-td{
-
-padding:18px;
-
-text-align:center;
-
-font-size:18px;
-
-border-bottom:1px solid #ddd;
-
-}
-
-tr:hover{
-
-background:#f8f8f8;
-
-}
-
-.btn{
-
-padding:10px 18px;
-
-border:none;
-
-color:white;
-
-text-decoration:none;
-
-border-radius:5px;
-
-font-size:16px;
-
-margin:2px;
-
-display:inline-block;
-
-}
-
-.view{
-
-background:#28a745;
-
-}
-
-.view:hover{
-
-background:#218838;
-
-}
-
-.delete{
-
-background:#e53935;
-
-}
-
-.delete:hover{
-
-background:#c62828;
-
-}
-
-@media(max-width:900px){
-
-table{
-display:block;
-overflow-x:auto;
-}
-
-header{
-flex-direction:column;
-}
-
-header nav{
-margin-top:15px;
-}
-
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers - College Canteen Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin_material.css">
 </head>
-
 <body>
 
-<header>
-
-<h2>🍽 College Canteen Admin</h2>
-
-<nav>
-
-<a href="dashboard.php">Dashboard</a>
-
-<a href="products.php">Products</a>
-
-<a href="customers.php">Customers</a>
-
-<a href="orders.php">Orders</a>
-
-<a href="missing_callback.php">Missing Callback</a>
-
-<a href="reports.php">Reports</a>
-
-<a href="messages.php">Messages</a>
-
-<a href="logout.php">Logout</a>
-
-</nav>
-
-</header>
-
-<div class="container">
-
-<div class="title">
-
-Registered Customers
-
-</div>
-
-<form method="GET">
-
-<div class="search-box">
-
-<input
-type="text"
-name="search"
-placeholder="Search Customer"
-value="<?php echo htmlspecialchars($search); ?>">
-
-<button>
-
-Search
-
-</button>
-
-</div>
-
-</form>
-
-<table>
-
-<tr>
-
-<th>ID</th>
-
-<th>Name</th>
-
-<th>Register No</th>
-
-<th>Department</th>
-
-<th>Email</th>
-
-<th>Action</th>
-
-</tr>
-
-<?php
-
-if(mysqli_num_rows($query)>0){
-
-while($row=mysqli_fetch_assoc($query)){
-
-?>
-
-<tr>
-
-<td><?php echo $row['id']; ?></td>
-
-<td><?php echo htmlspecialchars($row['name']); ?></td>
-
-<td><?php echo htmlspecialchars($row['regno']); ?></td>
-
-<td><?php echo htmlspecialchars($row['department']); ?></td>
-
-<td><?php echo htmlspecialchars($row['email']); ?></td>
-
-<td>
-
-<a
-class="btn view"
-href="customer_details.php?id=<?php echo $row['id']; ?>">
-
-View
-
-</a>
-
-<a
-class="btn delete"
-href="customers.php?delete=<?php echo $row['id']; ?>"
-onclick="return confirm('Delete this customer?')">
-
-Delete
-
-</a>
-
-</td>
-
-</tr>
-
-<?php
-
-}
-
-}else{
-
-?>
-
-<tr>
-
-<td colspan="6">
-
-No Customers Found
-
-</td>
-
-</tr>
-
-<?php
-
-}
-
-?>
-
-</table>
-
-</div>
+<?php include("header_nav.php"); ?>
+
+<main class="admin-container">
+
+    <div class="admin-header-row">
+        <div>
+            <h1 class="admin-page-title">
+                <i class="fa-solid fa-users"></i> Registered Students & Customers
+            </h1>
+            <p class="admin-subtitle">View student account profiles, departments, and individual purchase histories</p>
+        </div>
+
+        <form method="GET" class="search-container">
+            <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8;"></i>
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search by name, reg no, department..." 
+                value="<?php echo htmlspecialchars($search); ?>"
+            >
+            <?php if (!empty($search)): ?>
+                <a href="customers.php" style="color:#94a3b8; text-decoration:none;"><i class="fa-solid fa-xmark"></i></a>
+            <?php endif; ?>
+        </form>
+    </div>
+
+    <!-- STRUCTURED TABLE WITH RED-ORANGE HEADER -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="material-table">
+                <thead>
+                    <tr>
+                        <th style="width:70px;">ID</th>
+                        <th>Student Name</th>
+                        <th>Register No</th>
+                        <th>Department</th>
+                        <th>Email Address</th>
+                        <th style="text-align:right; width:160px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (mysqli_num_rows($query) > 0): ?>
+                        <?php while ($row = mysqli_fetch_assoc($query)): ?>
+                        <tr>
+                            <td><strong>#<?php echo $row['id']; ?></strong></td>
+                            <td>
+                                <div style="font-weight:700; color:#0f172a; font-size:15px;"><?php echo htmlspecialchars($row['name']); ?></div>
+                            </td>
+                            <td>
+                                <span style="font-family:monospace; font-weight:600; background:#f1f5f9; padding:3px 8px; border-radius:6px; color:#334155;">
+                                    <?php echo htmlspecialchars($row['regno'] ?: 'N/A'); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <span style="color:#475569; font-weight:500;">
+                                    <?php echo htmlspecialchars($row['department'] ?: 'General'); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <span style="color:#2563eb; font-size:13px;">
+                                    <i class="fa-regular fa-envelope" style="margin-right:4px;"></i><?php echo htmlspecialchars($row['email']); ?>
+                                </span>
+                            </td>
+                            <td style="text-align:right;">
+                                <a href="customer_details.php?id=<?php echo $row['id']; ?>" class="btn-material btn-primary" style="padding:6px 12px; font-size:12px; margin-right:4px;">
+                                    <i class="fa-solid fa-eye"></i> Details
+                                </a>
+                                <a href="customers.php?delete=<?php echo $row['id']; ?>" class="btn-material btn-danger" style="padding:6px 12px; font-size:12px;" onclick="return confirm('Delete this customer and all associated orders?');">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:40px; color:#94a3b8;">
+                                <i class="fa-solid fa-user-slash" style="font-size:36px; margin-bottom:10px; display:block; opacity:0.4;"></i>
+                                No customers found.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
 
 </body>
-
 </html>

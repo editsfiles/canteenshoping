@@ -1,0 +1,638 @@
+/* ==========================================================================
+   COLLEGE CANTEEN ADMIN - STANDARDIZED VIBRANT MATERIAL DESIGN SYSTEM
+   Theme:
+   - Top Nav: Deep Purple with Light Cyan Text
+   - Sub Nav Bar: Sleek Dark Bar with Icons
+   - Info Cards: Rounded with Colorful Gradients (Orange-red, Cyan-blue, Green, Gold, Purple)
+   - Tables: Vibrant Red-Orange Header with Green 'Completed' and Light-Yellow 'Pending' labels
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Brand Colors */
+    --top-nav-bg: linear-gradient(135deg, #2e0854 0%, #3b0764 50%, #4a044e 100%);
+    --top-nav-color: #a5f3fc;
+    --top-nav-hover: #ffffff;
+    --top-nav-active-bg: rgba(165, 243, 252, 0.18);
+    
+    --dark-bar-bg: #0f172a;
+    --dark-bar-text: #94a3b8;
+    --dark-bar-hover: #38bdf8;
+    
+    /* Card Gradients */
+    --card-products: linear-gradient(135deg, #ff5722 0%, #f4511e 60%, #e64a19 100%);
+    --card-customers: linear-gradient(135deg, #0284c7 0%, #06b6d4 60%, #0891b2 100%);
+    --card-orders: linear-gradient(135deg, #10b981 0%, #059669 60%, #047857 100%);
+    --card-sales: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+    --card-today-orders: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 60%, #6d28d9 100%);
+    --card-today-sales: linear-gradient(135deg, #a855f7 0%, #9333ea 60%, #7e22ce 100%);
+    
+    /* Table & Status Colors */
+    --table-header-bg: linear-gradient(90deg, #ea580c 0%, #f97316 50%, #ef4444 100%);
+    --badge-completed-bg: #dcfce7;
+    --badge-completed-text: #15803d;
+    --badge-completed-border: #86efac;
+    
+    --badge-pending-bg: #fef9c3;
+    --badge-pending-text: #854d0e;
+    --badge-pending-border: #fde047;
+    
+    --badge-cancelled-bg: #fee2e2;
+    --badge-cancelled-text: #b91c1c;
+    --badge-cancelled-border: #fca5a5;
+    
+    --body-bg: #f4f6fb;
+    --surface-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    background-color: var(--body-bg);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================================
+   1. TOP NAVIGATION BAR (Deep Purple with Light Cyan Text)
+   ========================================================================== */
+.admin-top-nav {
+    background: var(--top-nav-bg);
+    padding: 14px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(46, 8, 84, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.admin-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.admin-logo i {
+    color: #67e8f9;
+    font-size: 22px;
+    filter: drop-shadow(0 2px 8px rgba(103, 232, 249, 0.4));
+}
+
+.admin-menu {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.admin-menu a {
+    color: var(--top-nav-color);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-menu a:hover {
+    color: var(--top-nav-hover);
+    background: var(--top-nav-active-bg);
+    transform: translateY(-1px);
+}
+
+.admin-menu a.active {
+    color: #ffffff;
+    background: rgba(165, 243, 252, 0.25);
+    font-weight: 700;
+    border-bottom: 2px solid #38bdf8;
+    box-shadow: 0 2px 10px rgba(56, 189, 248, 0.25);
+}
+
+.admin-menu a.logout-btn {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    margin-left: 8px;
+}
+
+.admin-menu a.logout-btn:hover {
+    color: #ffffff;
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+/* ==========================================================================
+   2. DARK SUB-BAR WITH ICONS (Below Top Nav)
+   ========================================================================== */
+.admin-dark-bar {
+    background: var(--dark-bar-bg);
+    padding: 8px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dark-bar-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.dark-bar-links a {
+    color: var(--dark-bar-text);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+}
+
+.dark-bar-links a:hover {
+    color: var(--dark-bar-hover);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.dark-bar-links a.active {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    font-weight: 600;
+}
+
+.dark-bar-status {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.dark-bar-badge {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   3. MAIN CONTENT CONTAINER & HEADINGS
+   ========================================================================== */
+.admin-container {
+    width: 95%;
+    max-width: 1440px;
+    margin: 25px auto 40px;
+    flex: 1;
+}
+
+.admin-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.admin-page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-page-title i {
+    color: #ea580c;
+}
+
+.admin-subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+/* ==========================================================================
+   4. ROUNDED INFO CARDS WITH COLORFUL GRADIENTS
+   ========================================================================== */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.info-card {
+    border-radius: 16px;
+    padding: 22px 24px;
+    color: #ffffff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+}
+
+.info-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 140px;
+    height: 140px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.card-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.92;
+}
+
+.card-icon {
+    font-size: 26px;
+    opacity: 0.85;
+}
+
+.card-value {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+/* Individual Card Gradients Specified by User */
+.card-products     { background: var(--card-products); }
+.card-customers    { background: var(--card-customers); }
+.card-orders       { background: var(--card-orders); }
+.card-sales        { background: var(--card-sales); }
+.card-today-orders { background: var(--card-today-orders); }
+.card-today-sales  { background: var(--card-today-sales); }
+
+/* ==========================================================================
+   5. STRUCTURED TABLE WITH RED-ORANGE HEADER
+   ========================================================================== */
+.table-card {
+    background: var(--surface-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.material-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.material-table thead tr,
+.material-table tr:first-child:not(tbody tr) {
+    background: var(--table-header-bg);
+    color: #ffffff;
+}
+
+.material-table th {
+    background: transparent;
+    color: #ffffff !important;
+    padding: 15px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    white-space: nowrap;
+}
+
+.material-table td {
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--text-main);
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.material-table tbody tr {
+    transition: background 0.18s ease;
+}
+
+.material-table tbody tr:hover {
+    background-color: #fff7ed; /* Subtle warm orange row highlight */
+}
+
+.material-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ==========================================================================
+   6. STANDARDIZED STATUS BADGES
+   ========================================================================== */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.badge-completed,
+.badge-status.Completed,
+.badge-status.Delivered,
+.badge-status.Available {
+    background: var(--badge-completed-bg);
+    color: var(--badge-completed-text);
+    border: 1px solid var(--badge-completed-border);
+}
+
+.badge-pending,
+.badge-status.Pending,
+.badge-status.Preparing,
+.badge-status.Ready {
+    background: var(--badge-pending-bg);
+    color: var(--badge-pending-text);
+    border: 1px solid var(--badge-pending-border);
+}
+
+.badge-cancelled,
+.badge-status.Cancelled,
+.badge-status.Failed,
+.badge-status.Unavailable {
+    background: var(--badge-cancelled-bg);
+    color: var(--badge-cancelled-text);
+    border: 1px solid var(--badge-cancelled-border);
+}
+
+/* ==========================================================================
+   7. MATERIAL BUTTONS & CONTROLS
+   ========================================================================== */
+.btn-material {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-material:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+}
+
+.btn-primary   { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; }
+.btn-success   { background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; }
+.btn-danger    { background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; }
+.btn-warning   { background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; }
+.btn-orange    { background: linear-gradient(135deg, #ea580c, #c2410c); color: #ffffff; }
+
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 4px 12px;
+    transition: border-color 0.2s;
+}
+
+.search-container:focus-within {
+    border-color: #ea580c;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+}
+
+.search-container input {
+    border: none;
+    outline: none;
+    padding: 8px 6px;
+    font-size: 14px;
+    width: 240px;
+}
+
+/* ==========================================================================
+   8. FORMS, ALERTS & LOG BOXES
+   ========================================================================== */
+.admin-card {
+    background: var(--surface-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    padding: 26px 30px;
+    margin-bottom: 25px;
+}
+
+.admin-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.admin-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-card-title i {
+    color: #ea580c;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #ea580c;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.alert-material {
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.alert-material.success {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.alert-material.warning {
+    background: #fef9c3;
+    color: #854d0e;
+    border: 1px solid #fef08a;
+}
+
+.alert-material.danger {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+}
+
+.log-terminal {
+    background: #0f172a;
+    color: #38bdf8;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 12px;
+    padding: 18px 20px;
+    border-radius: 12px;
+    max-height: 280px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    border: 1px solid #1e293b;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   8. RESPONSIVE DESIGN (All screens consistent)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .admin-top-nav {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 20px;
+    }
+    
+    .admin-menu {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+    
+    .admin-dark-bar {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 10px 20px;
+    }
+    
+    .dark-bar-links {
+        overflow-x: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-page-title {
+        font-size: 20px;
+    }
+    
+    .card-value {
+        font-size: 26px;
+    }
+}

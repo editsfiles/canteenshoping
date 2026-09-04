@@ -115,424 +115,46 @@ if (!$result) {
 }
 
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>Manage Orders - College Canteen Admin</title>
-
-
-<style>
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f5f6fa;
-    color: #222;
-}
-
-
-/* ==============================
-   HEADER
-   ============================== */
-
-.header {
-    width: 100%;
-    min-height: 70px;
-
-    background: linear-gradient(
-        90deg,
-        #6a11cb,
-        #2575fc
-    );
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 0 35px;
-
-    color: white;
-
-    box-shadow:
-        0 3px 12px rgba(0, 0, 0, 0.15);
-}
-
-.logo {
-    font-size: 25px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.nav {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-}
-
-.nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 15px;
-}
-
-.nav a:hover {
-    color: #ffeb3b;
-}
-
-
-/* ==============================
-   MAIN
-   ============================== */
-
-.container {
-    width: 95%;
-    max-width: 1400px;
-
-    margin: 35px auto;
-}
-
-.page-title {
-    font-size: 28px;
-    margin-bottom: 25px;
-    color: #222;
-}
-
-
-/* ==============================
-   TABLE
-   ============================== */
-
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-
-    background: white;
-
-    border-radius: 15px;
-
-    box-shadow:
-        0 5px 20px rgba(0, 0, 0, 0.10);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1150px;
-}
-
-thead {
-    background: linear-gradient(
-        90deg,
-        #ff4938,
-        #df2370
-    );
-
-    color: white;
-}
-
-th {
-    padding: 17px 14px;
-    text-align: center;
-    font-size: 15px;
-}
-
-td {
-    padding: 15px 14px;
-    text-align: center;
-    border-bottom: 1px solid #eeeeee;
-    font-size: 14px;
-}
-
-tbody tr:hover {
-    background: #f8f9ff;
-}
-
-
-/* ==============================
-   PAYMENT STATUS
-   ============================== */
-
-.status {
-    display: inline-block;
-
-    min-width: 105px;
-
-    padding: 8px 14px;
-
-    border-radius: 20px;
-
-    font-weight: bold;
-
-    text-transform: capitalize;
-}
-
-.status-completed {
-    background: #d4edda;
-    color: #16803c;
-}
-
-.status-pending {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.status-cancelled {
-    background: #f8d7da;
-    color: #b02a37;
-}
-
-.status-failed {
-    background: #f8d7da;
-    color: #b02a37;
-}
-
-.status-processing {
-    background: #cff4fc;
-    color: #055160;
-}
-
-
-/* ==============================
-   FOOD STATUS
-   ============================== */
-
-.food-status {
-    display: inline-block;
-
-    min-width: 100px;
-
-    padding: 7px 12px;
-
-    border-radius: 20px;
-
-    font-weight: bold;
-}
-
-.food-preparing {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.food-ready {
-    background: #d4edda;
-    color: #16803c;
-}
-
-.food-delivered {
-    background: #cfe2ff;
-    color: #084298;
-}
-
-
-/* ==============================
-   UPDATE FORM
-   ============================== */
-
-.update-form {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 7px;
-
-    flex-wrap: wrap;
-}
-
-.update-form select {
-    padding: 8px 10px;
-
-    border: 1px solid #ccc;
-
-    border-radius: 6px;
-
-    background: white;
-
-    font-size: 13px;
-
-    outline: none;
-
-    cursor: pointer;
-}
-
-.update-form select:focus {
-    border-color: #6a11cb;
-}
-
-.update-btn {
-    padding: 8px 12px;
-
-    border: none;
-
-    border-radius: 6px;
-
-    background: linear-gradient(
-        90deg,
-        #6a11cb,
-        #2575fc
-    );
-
-    color: white;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition: .3s;
-}
-
-.update-btn:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 4px 10px rgba(0,0,0,.2);
-}
-
-
-/* ==============================
-   EMPTY
-   ============================== */
-
-.empty {
-    text-align: center;
-
-    padding: 50px;
-
-    color: #777;
-
-    font-size: 18px;
-}
-
-
-/* ==============================
-   RESPONSIVE
-   ============================== */
-
-@media (max-width: 900px) {
-
-    .header {
-        flex-direction: column;
-
-        gap: 15px;
-
-        padding: 20px;
-    }
-
-    .nav {
-        flex-wrap: wrap;
-
-        justify-content: center;
-
-        gap: 15px;
-    }
-
-    .container {
-        width: 94%;
-    }
-
-}
-
-</style>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitchen Orders - College Canteen Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+<link rel="stylesheet" href="css/admin_material.css">
 </head>
-
-
 <body>
 
+<?php $activePage = 'orders'; include("header_nav.php"); ?>
 
-<!-- ==============================
-     HEADER
-     ============================== -->
+<main class="admin-container">
 
-<header class="header">
-
-    <div class="logo">
-        🍴 College Canteen Admin
-    </div>
-
-    <nav class="nav">
-
-        <a href="dashboard.php">
-            Dashboard
-        </a>
-
-        <a href="products.php">
-            Products
-        </a>
-
-        <a href="customers.php">
-            Customers
-        </a>
-
-        <a href="orders.php">
-            Orders
-        </a>
-
-        <a href="missing_callback.php">
-            Missing Callback
-        </a>
-
-        <a href="reports.php">
-            Reports
-        </a>
-
-        <a href="messages.php">
-            Messages
-        </a>
-
-        <a href="logout.php">
-            Logout
-        </a>
-
-    </nav>
-
-</header>
-
-
-<main class="container">
-
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:25px;">
-        <h1 class="page-title" style="margin-bottom:0;">
-            Order Management
-        </h1>
+    <div class="admin-header-row">
+        <div>
+            <h1 class="admin-page-title">
+                <i class="fa-solid fa-cart-shopping"></i> Kitchen Order Management
+            </h1>
+            <p class="admin-subtitle">Live real-time queue, item quantities, and kitchen status controls</p>
+        </div>
 
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <!-- QUICK PAYMENT REF ID VERIFIER -->
-            <form action="../verify_ref.php" method="GET" target="_blank" style="display:flex; gap:8px; margin:0;">
+            <form action="../verify_ref.php" method="GET" target="_blank" class="search-container" style="margin:0;">
+                <i class="fa-solid fa-receipt" style="color:#94a3b8;"></i>
                 <input 
                     type="text" 
                     name="ref" 
-                    placeholder="Enter Payment Ref / Order ID..." 
-                    style="padding:10px 14px; border:2px solid #6a11cb; border-radius:8px; font-size:14px; width:260px; outline:none;"
+                    placeholder="Verify Ref / Order ID..." 
+                    style="width:190px;"
                     required
                 >
-                <button 
-                    type="submit" 
-                    style="background:linear-gradient(90deg,#6a11cb,#2575fc); color:white; border:none; padding:10px 18px; border-radius:8px; font-weight:600; cursor:pointer; font-size:14px; display:flex; align-items:center; gap:6px; white-space:nowrap;"
-                >
-                    <i class="fa-solid fa-bolt"></i> Check Gateway
+                <button type="submit" class="btn-material btn-orange" style="padding:6px 12px; font-size:12px;">
+                    <i class="fa-solid fa-bolt"></i> Check
                 </button>
             </form>
 
-            <a href="missing_callback.php" style="background:#0284c7; color:white; padding:10px 16px; border-radius:8px; font-weight:600; font-size:14px; text-decoration:none; display:flex; align-items:center; gap:6px; white-space:nowrap;">
+            <a href="missing_callback.php" class="btn-material btn-primary" style="background:#0284c7;">
                 <i class="fa-solid fa-clock-rotate-left"></i> Missing Callbacks
             </a>
 
@@ -540,7 +162,7 @@ tbody tr:hover {
                 id="btnSoundToggle" 
                 type="button" 
                 onclick="toggleSoundAlert()" 
-                style="background:#10b981; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap;"
+                class="btn-material btn-success"
                 title="Toggle kitchen bell chime alert"
             >
                 <i class="fa-solid fa-bell"></i> <span id="soundStatusText">Kitchen Bell: ON</span>
@@ -548,11 +170,9 @@ tbody tr:hover {
         </div>
     </div>
 
-    <div class="table-container">
-
-        <?php if (mysqli_num_rows($result) > 0): ?>
-
-            <table>
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="material-table">
 
                 <thead>
 
@@ -774,56 +394,31 @@ tbody tr:hover {
 
 
                         <!-- PAYMENT STATUS -->
-
                         <td>
-
-                            <span
-                                class="status status-<?php
-
-                                echo htmlspecialchars(
-                                    $statusClass
-                                );
-
-                                ?>"
-                            >
-
-                                <?php
-
-                                echo htmlspecialchars(
-                                    $status
-                                );
-
-                                ?>
-
+                            <?php 
+                            $isPaid = (strtolower($status) === 'completed' || strtolower($status) === 'paid');
+                            $isPending = (strtolower($status) === 'pending');
+                            ?>
+                            <span class="badge-status <?php echo $isPaid ? 'badge-completed' : ($isPending ? 'badge-pending' : 'badge-cancelled'); ?>">
+                                <?php if ($isPaid): ?>
+                                    <i class="fa-solid fa-circle-check"></i> Completed
+                                <?php elseif ($isPending): ?>
+                                    <i class="fa-solid fa-clock"></i> Pending
+                                <?php else: ?>
+                                    <i class="fa-solid fa-circle-xmark"></i> <?php echo htmlspecialchars($status); ?>
+                                <?php endif; ?>
                             </span>
-
                         </td>
 
-
                         <!-- FOOD STATUS -->
-
                         <td>
-
-                            <span
-                                class="food-status food-<?php
-
-                                echo htmlspecialchars(
-                                    $foodStatusClass
-                                );
-
-                                ?>"
-                            >
-
-                                <?php
-
-                                echo htmlspecialchars(
-                                    $foodStatus
-                                );
-
-                                ?>
-
+                            <?php 
+                            $isDeliv = (strtolower($foodStatus) === 'delivered');
+                            $isReady = (strtolower($foodStatus) === 'ready');
+                            ?>
+                            <span class="badge-status <?php echo $isDeliv ? 'badge-completed' : 'badge-pending'; ?>" <?php echo $isReady ? 'style="background:#fef3c7; color:#b45309; border-color:#fde68a;"' : ''; ?>>
+                                <?php echo $isDeliv ? '✅ Delivered' : ($isReady ? '🔔 Ready' : '🍳 Preparing'); ?>
                             </span>
-
                         </td>
 
 
@@ -943,17 +538,8 @@ tbody tr:hover {
                 <?php endwhile; ?>
 
                 </tbody>
-
             </table>
-
-        <?php else: ?>
-
-            <div class="empty">
-                No orders found.
-            </div>
-
-        <?php endif; ?>
-
+        </div>
     </div>
 
 </main>
