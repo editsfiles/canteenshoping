@@ -119,9 +119,9 @@ foreach ($possibleDateColumns as $column) {
 
 if ($dateColumn !== null && !empty($order[$dateColumn])) {
     $timeVal = strtotime($order[$dateColumn]);
-    $orderDate = ($timeVal !== false) ? date("d M Y, h:i:s A", $timeVal) : $order[$dateColumn];
+    $orderDate = ($timeVal !== false) ? date("d M Y, h:i:s A", $timeVal) . " IST" : $order[$dateColumn];
 } else {
-    $orderDate = date("d M Y, h:i:s A");
+    $orderDate = date("d M Y, h:i:s A") . " IST";
 }
 
 $bankUtr = $order['bank_utr'] ?? '';
@@ -720,8 +720,9 @@ body {
         </p>
 
         <p>
-            <strong>Date:</strong>
+            <strong>Date & Time:</strong>
             <?php echo htmlspecialchars($orderDate); ?>
+            <span style="display:inline-block; font-size:11px; font-weight:800; color:#3b82f6; background:#eff6ff; padding:2px 7px; border-radius:10px; margin-left:4px; border:1px solid #bfdbfe;">Asia/Kolkata</span>
         </p>
 
     </div>

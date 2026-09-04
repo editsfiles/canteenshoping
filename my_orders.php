@@ -222,6 +222,142 @@ foreach ($possibleDateColumns as $column) {
 
 
 /* =========================================================
+   REAL TIME ZONE BANNER & ORDER TIMESTAMP STYLING
+   ========================================================= */
+.timezone-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #1e1b4b, #312e81, #3730a3);
+    color: white;
+    padding: 16px 22px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 20px rgba(49, 46, 129, 0.25);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.tz-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tz-pulse-dot {
+    width: 12px;
+    height: 12px;
+    background: #34d399;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+    animation: tzPulse 1.8s infinite;
+}
+
+@keyframes tzPulse {
+    0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+.tz-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    display: block;
+    color: #f8fafc;
+}
+
+.tz-sub {
+    font-size: 12px;
+    color: #a5b4fc;
+    display: block;
+    margin-top: 2px;
+}
+
+.tz-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tz-clock-pill {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #38bdf8;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(4px);
+}
+
+.tz-today-badge {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    padding: 7px 13px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #a7f3d0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Order Time in Table */
+.order-time-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    text-align: left;
+}
+
+.order-date-primary {
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 13px;
+}
+
+.order-time-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #475569;
+}
+
+.badge-ist-pill {
+    background: #e0e7ff;
+    color: #4338ca;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 6px;
+    letter-spacing: 0.4px;
+    border: 1px solid #c7d2fe;
+}
+
+.badge-time-ago {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #059669;
+    font-weight: 600;
+    background: #ecfdf5;
+    padding: 2px 7px;
+    border-radius: 8px;
+    width: fit-content;
+    border: 1px solid #a7f3d0;
+    margin-top: 2px;
+}
+
+/* =========================================================
    TABLE RESPONSIVE
    ========================================================= */
 
@@ -286,6 +422,26 @@ foreach ($possibleDateColumns as $column) {
 
 <div class="container">
 
+<!-- REAL-TIME ZONE BANNER (Modern Vibrant Card Design) -->
+<div class="timezone-banner">
+    <div class="tz-left">
+        <div class="tz-pulse-dot"></div>
+        <div>
+            <span class="tz-title">Live Indian Standard Time (IST)</span>
+            <span class="tz-sub">Real-Time Kitchen Sync & Order Tracking &bull; Asia/Kolkata (UTC+05:30)</span>
+        </div>
+    </div>
+    <div class="tz-right">
+        <div class="tz-clock-pill">
+            <i class="fa-regular fa-clock"></i>
+            <span id="studentLiveClock"><?php echo date('h:i:s A'); ?> IST</span>
+        </div>
+        <span class="tz-today-badge">
+            <i class="fa-regular fa-calendar-check"></i> <?php echo date('D, d M Y'); ?>
+        </span>
+    </div>
+</div>
+
 <?php if (!empty($cancelMsg)) echo $cancelMsg; ?>
 
 <?php
@@ -348,7 +504,7 @@ if (mysqli_num_rows($result) == 0) {
 
     <th>Status</th>
 
-    <th>Date</th>
+    <th><i class="fa-regular fa-clock"></i> Order Time (IST)</th>
 
     <th>Invoice</th>
 
@@ -613,26 +769,45 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 
     <!-- =================================================
-         DATE
+         DATE & REAL TIME ZONE
          ================================================= -->
 
     <td>
 
         <?php
-
-        if (
-            $orderDate !== "N/A" &&
-            !empty($orderDate)
-        ) {
-
-            echo htmlspecialchars($orderDate);
-
+        if ($orderDate !== "N/A" && !empty($orderDate)) {
+            $ts = strtotime($orderDate);
+            if ($ts !== false) {
+                $formattedDate = date("d M Y", $ts);
+                $formattedTime = date("h:i A", $ts);
+                
+                // Relative time calculation
+                $diff = time() - $ts;
+                if ($diff < 60) {
+                    $timeAgo = "Just now";
+                } elseif ($diff < 3600) {
+                    $timeAgo = floor($diff / 60) . " mins ago";
+                } elseif ($diff < 86400) {
+                    $timeAgo = floor($diff / 3600) . " hrs ago";
+                } else {
+                    $timeAgo = floor($diff / 86400) . " days ago";
+                }
+                ?>
+                <div class="order-time-wrapper">
+                    <div class="order-date-primary"><?php echo htmlspecialchars($formattedDate); ?></div>
+                    <div class="order-time-secondary">
+                        <span><?php echo htmlspecialchars($formattedTime); ?></span>
+                        <span class="badge-ist-pill" title="Indian Standard Time (UTC+05:30)">IST</span>
+                    </div>
+                    <span class="badge-time-ago"><i class="fa-solid fa-clock-rotate-left"></i> <?php echo htmlspecialchars($timeAgo); ?></span>
+                </div>
+                <?php
+            } else {
+                echo htmlspecialchars($orderDate) . ' <span class="badge-ist-pill">IST</span>';
+            }
         } else {
-
             echo '<span style="color:#999;">N/A</span>';
-
         }
-
         ?>
 
     </td>
@@ -751,6 +926,32 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 </div>
 
+
+<script>
+// Real-Time Ticking Indian Standard Time (IST) Clock
+(function() {
+    function updateStudentClock() {
+        const el = document.getElementById('studentLiveClock');
+        if (!el) return;
+        try {
+            const options = {
+                timeZone: 'Asia/Kolkata',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            const formatter = new Intl.DateTimeFormat('en-US', options);
+            el.textContent = formatter.format(new Date()) + ' IST';
+        } catch (e) {
+            const now = new Date();
+            el.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) + ' IST';
+        }
+    }
+    updateStudentClock();
+    setInterval(updateStudentClock, 1000);
+})();
+</script>
 
 </body>
 
