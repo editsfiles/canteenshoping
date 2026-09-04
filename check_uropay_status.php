@@ -180,6 +180,11 @@ if (!empty($userUtr)) {
             mysqli_stmt_bind_param($upd, "si", $cleanUtr, $localOrderId);
             mysqli_stmt_execute($upd);
             mysqli_stmt_close($upd);
+
+            @include_once(__DIR__ . "/php/mail.php");
+            if (function_exists('sendOrderInvoiceEmail')) {
+                @sendOrderInvoiceEmail($localOrderId, $conn);
+            }
         }
         $_SESSION['payment_status'] = 'Completed';
         $_SESSION['local_order_id'] = $localOrderId;
@@ -431,10 +436,7 @@ mysqli_stmt_bind_param(
 
 
 if (!mysqli_stmt_execute($stmt)) {
-
-    $error =
-        mysqli_stmt_error($stmt);
-
+    $error = mysqli_stmt_error($stmt);
     mysqli_stmt_close($stmt);
 
     echo json_encode([
@@ -443,12 +445,17 @@ if (!mysqli_stmt_execute($stmt)) {
         "message" => "Database update failed.",
         "error" => $error
     ]);
-
     exit();
-
 }
 
 mysqli_stmt_close($stmt);
+
+if ($localStatus === 'Completed') {
+    @include_once(__DIR__ . "/php/mail.php");
+    if (function_exists('sendOrderInvoiceEmail')) {
+        @sendOrderInvoiceEmail($localOrderId, $conn);
+    }
+}
 
 $_SESSION['payment_status'] = $localStatus;
 $_SESSION['local_order_id'] = $localOrderId;

@@ -19,6 +19,9 @@ include("php/db.php");
 
 <title>College Canteen</title>
 <link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#16a34a">
+<link rel="apple-touch-icon" href="uploads/Burger.jpg">
 </head>
 <body>
 
@@ -130,6 +133,14 @@ Food Categories
 <center>College Canteen Management System
 </center>
 </footer>
+
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW notice:', err));
+    });
+}
+</script>
 
 </body>
 

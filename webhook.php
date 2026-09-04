@@ -248,6 +248,13 @@ file_put_contents(
     FILE_APPEND
 );
 
+if ($localStatus === 'Completed') {
+    @include_once(__DIR__ . "/php/mail.php");
+    if (function_exists('sendOrderInvoiceEmail')) {
+        @sendOrderInvoiceEmail($localOrderId, $conn);
+    }
+}
+
 // ----------------------------------------------------------------------------
 // 7. AUTHORITATIVE 200 OK RESPONSE
 // ----------------------------------------------------------------------------

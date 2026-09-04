@@ -36,6 +36,9 @@ if (isset($_GET['search']) && trim($_GET['search']) != "") {
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Food Menu</title>
 <link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#16a34a">
+<link rel="apple-touch-icon" href="uploads/Burger.jpg">
 </head>
 <body>
 <header>
@@ -100,6 +103,12 @@ function changeQty(id,val){
  let q=parseInt(e.value)+val;
  if(q<1) q=1;
  e.value=q;
+}
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW notice:', err));
+    });
 }
 </script>
 </body>

@@ -13,6 +13,31 @@ if (!isset($_SESSION['admin'])) {
 
 include("../php/db.php");
 
+/* =========================================================
+   LIVE ORDER CHECK ENDPOINT (AJAX)
+   ========================================================= */
+if (isset($_GET['check_new'])) {
+    header('Content-Type: application/json');
+    $lastId = (int)($_GET['last_id'] ?? 0);
+    $q = mysqli_query($conn, "SELECT id, total_amount, status, food_status FROM orders WHERE id > $lastId AND (status = 'Completed' OR food_status = 'Preparing') ORDER BY id DESC LIMIT 1");
+    if ($q && $r = mysqli_fetch_assoc($q)) {
+        echo json_encode([
+            'has_new' => true,
+            'id' => (int)$r['id'],
+            'amount' => (float)$r['total_amount'],
+            'food_status' => $r['food_status']
+        ]);
+    } else {
+        echo json_encode(['has_new' => false]);
+    }
+    exit();
+}
+
+$maxOrderRes = mysqli_query($conn, "SELECT MAX(id) AS max_id FROM orders");
+$maxOrderRow = mysqli_fetch_assoc($maxOrderRes);
+$maxOrderId  = (int)($maxOrderRow['max_id'] ?? 0);
+
+
 
 /* =========================================================
    UPDATE FOOD & PAYMENT STATUS
@@ -510,6 +535,16 @@ tbody tr:hover {
             <a href="missing_callback.php" style="background:#0284c7; color:white; padding:10px 16px; border-radius:8px; font-weight:600; font-size:14px; text-decoration:none; display:flex; align-items:center; gap:6px; white-space:nowrap;">
                 <i class="fa-solid fa-clock-rotate-left"></i> Missing Callbacks
             </a>
+
+            <button 
+                id="btnSoundToggle" 
+                type="button" 
+                onclick="toggleSoundAlert()" 
+                style="background:#10b981; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap;"
+                title="Toggle kitchen bell chime alert"
+            >
+                <i class="fa-solid fa-bell"></i> <span id="soundStatusText">Kitchen Bell: ON</span>
+            </button>
         </div>
     </div>
 
@@ -923,6 +958,120 @@ tbody tr:hover {
 
 </main>
 
+<!-- FLOATING NEW ORDER NOTIFICATION TOAST -->
+<div id="newOrderToast" style="
+    display:none; 
+    position:fixed; 
+    bottom:30px; 
+    right:30px; 
+    background:#16a34a; 
+    color:white; 
+    padding:16px 24px; 
+    border-radius:12px; 
+    box-shadow:0 10px 25px rgba(0,0,0,0.25); 
+    font-family:sans-serif; 
+    z-index:9999;
+    animation:slideUp 0.3s ease;
+">
+    <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:26px;">🔔</span>
+        <div>
+            <div style="font-weight:700; font-size:16px;" id="toastTitle">New Order Received!</div>
+            <div style="font-size:13px; opacity:0.9;" id="toastDesc">Order placed just now.</div>
+        </div>
+        <button onclick="window.location.reload()" style="background:white; color:#16a34a; border:none; padding:8px 14px; border-radius:6px; font-weight:700; cursor:pointer; margin-left:10px;">Refresh</button>
+    </div>
+</div>
+
+<style>
+@keyframes slideUp {
+    from { transform:translateY(50px); opacity:0; }
+    to { transform:translateY(0); opacity:1; }
+}
+</style>
+
+<script>
+let soundEnabled = true;
+let latestOrderId = <?php echo (int)$maxOrderId; ?>;
+
+function toggleSoundAlert() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById("btnSoundToggle");
+    const txt = document.getElementById("soundStatusText");
+    if (soundEnabled) {
+        btn.style.background = "#10b981";
+        txt.innerText = "Kitchen Bell: ON";
+        playKitchenChime();
+    } else {
+        btn.style.background = "#64748b";
+        txt.innerText = "Kitchen Bell: OFF";
+    }
+}
+
+function playKitchenChime() {
+    if (!soundEnabled) return;
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        
+        // Ding
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(659.25, ctx.currentTime);
+        gain1.gain.setValueAtTime(0.35, ctx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start();
+        osc1.stop(ctx.currentTime + 0.7);
+
+        // Dong
+        setTimeout(() => {
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(880, ctx.currentTime);
+            gain2.gain.setValueAtTime(0.4, ctx.currentTime);
+            gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start();
+            osc2.stop(ctx.currentTime + 1.2);
+        }, 180);
+    } catch(e) {
+        console.warn("Chime notice:", e);
+    }
+}
+
+// Poll every 5 seconds for new orders
+setInterval(async () => {
+    try {
+        const res = await fetch("orders.php?check_new=1&last_id=" + latestOrderId + "&t=" + Date.now());
+        const data = await res.json();
+        if (data && data.has_new && data.id > latestOrderId) {
+            latestOrderId = data.id;
+            playKitchenChime();
+            
+            const toast = document.getElementById("newOrderToast");
+            const title = document.getElementById("toastTitle");
+            const desc = document.getElementById("toastDesc");
+            if (toast && title && desc) {
+                title.innerText = "🔔 New Order #" + data.id + " (" + (data.food_status || "Preparing") + ")";
+                desc.innerText = "Amount: ₹" + (data.amount || 0).toFixed(2) + " • Refreshing list...";
+                toast.style.display = "block";
+            }
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 2500);
+        }
+    } catch(err) {
+        // silent retry
+    }
+}, 5000);
+</script>
 
 </body>
 
