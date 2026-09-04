@@ -27,6 +27,7 @@ mysqli_report(MYSQLI_REPORT_OFF);
 $conn = false;
 $error = '';
 
+// Cloud database connection with SSL when requested.
 if ($ssl) {
     $db = mysqli_init();
     if ($db) {
@@ -40,22 +41,46 @@ if ($ssl) {
     }
 }
 
+// Normal TCP connection.
 if (!$conn) {
     $conn = @mysqli_connect($host, $user, $pass, $name, $port);
-    if (!$conn) $error = mysqli_connect_error() ?: $error ?: 'Database connection failed';
+    if (!$conn) {
+        $error = mysqli_connect_error() ?: $error ?: 'Database connection failed';
+    }
 }
 
-// Resilient fallback for local / container database if credentials or host format had mismatch
-if (!$conn && (empty($host) || $host === 'localhost' || $host === '127.0.0.1')) {
-    $socket = null;
-    $possibleSockets = ['/run/mysqld/mysqld.sock', '/var/run/mysqld/mysqld.sock', '/tmp/mysql.sock'];
-    foreach ($possibleSockets as $sp) {
-        if (file_exists($sp)) {
-            $socket = $sp;
+// Render's Docker image runs MariaDB locally when no external DB is configured.
+// MariaDB's default root account may authenticate through its Unix socket, so try
+// the socket explicitly before trying other local credentials.
+if (!$conn && ($host === 'localhost' || $host === '127.0.0.1' || empty($host))) {
+    $possibleSockets = [
+        '/run/mysqld/mysqld.sock',
+        '/var/run/mysqld/mysqld.sock',
+        '/tmp/mysql.sock'
+    ];
+
+    foreach ($possibleSockets as $socket) {
+        if (!file_exists($socket)) {
+            continue;
+        }
+
+        $conn = @mysqli_connect('localhost', $user, $pass, $name, $port, $socket);
+        if ($conn) {
             break;
         }
-    }
 
+        // MariaDB's socket-authenticated root commonly uses an empty password.
+        if ($user === 'root') {
+            $conn = @mysqli_connect('localhost', 'root', '', $name, $port, $socket);
+            if ($conn) {
+                break;
+            }
+        }
+    }
+}
+
+// Last-resort compatibility attempts for older local/container databases.
+if (!$conn && ($host === 'localhost' || $host === '127.0.0.1' || empty($host))) {
     $credList = [
         [$user, $pass],
         [$user, 'canteen_pass'],
@@ -68,27 +93,10 @@ if (!$conn && (empty($host) || $host === 'localhost' || $host === '127.0.0.1')) 
         ['root', $pass],
     ];
 
-    $hostTargets = [];
-    if ($socket) {
-        $hostTargets[] = ['localhost', $socket];
-    }
-    $hostTargets[] = ['127.0.0.1', null];
-    $hostTargets[] = ['localhost', null];
-
-    foreach ($hostTargets as $ht) {
-        $h = $ht[0];
-        $s = $ht[1];
-        foreach ($credList as $cr) {
-            $u = $cr[0];
-            $p = $cr[1];
-            if ($s) {
-                $conn = @mysqli_connect($h, $u, $p, $name, $port, $s);
-            } else {
-                $conn = @mysqli_connect($h, $u, $p, $name, $port);
-            }
-            if ($conn) {
-                break 2;
-            }
+    foreach ($credList as $cr) {
+        $conn = @mysqli_connect('127.0.0.1', $cr[0], $cr[1], $name, $port);
+        if ($conn) {
+            break;
         }
     }
 }
