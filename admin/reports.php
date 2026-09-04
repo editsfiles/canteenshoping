@@ -477,7 +477,7 @@ padding:0;
             <i class="fa fa-shopping-cart"></i> Orders
         </a>
 
-        <a href="missing_callback.php" style="color:#ffeb3b;font-weight:700;">
+        <a href="missing_callback.php">
             <i class="fa fa-bolt"></i> Missing Callback
         </a>
 

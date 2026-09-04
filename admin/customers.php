@@ -305,7 +305,7 @@ margin-top:15px;
 
 <a href="orders.php">Orders</a>
 
-<a href="missing_callback.php" style="color:#ffeb3b;font-weight:700;">⚡ Missing Callback</a>
+<a href="missing_callback.php">Missing Callback</a>
 
 <a href="reports.php">Reports</a>
 

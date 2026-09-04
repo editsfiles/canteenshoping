@@ -259,7 +259,7 @@ table tr:hover{
 <a href="products.php">Products</a>
 <a href="customers.php">Customers</a>
 <a href="orders.php">Orders</a>
-<a href="missing_callback.php" style="color:#ffeb3b;font-weight:700;">⚡ Missing Callback</a>
+<a href="missing_callback.php">Missing Callback</a>
 <a href="reports.php">Reports</a>
 <a href="messages.php">Messages</a>
 <a href="logout.php">Logout</a>

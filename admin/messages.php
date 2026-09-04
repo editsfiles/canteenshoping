@@ -533,7 +533,7 @@ min-width:900px;
             <i class="fa-solid fa-cart-shopping"></i> Orders
         </a>
 
-        <a href="missing_callback.php" style="color:#ffeb3b;font-weight:700;">
+        <a href="missing_callback.php">
             <i class="fa-solid fa-bolt"></i> Missing Callback
         </a>
 

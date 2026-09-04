@@ -486,8 +486,8 @@ tbody tr:hover {
             Orders
         </a>
 
-        <a href="missing_callback.php" style="color:#38bdf8;font-weight:700;">
-            ⚡ Missing Callback
+        <a href="missing_callback.php">
+            Missing Callback
         </a>
 
         <a href="reports.php">

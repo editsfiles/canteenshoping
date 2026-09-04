@@ -156,7 +156,7 @@ th { background: #f8fafc; color: #64748b; font-weight: 600; }
         <a href="products.php">Products</a>
         <a href="customers.php">Customers</a>
         <a href="orders.php">Orders</a>
-        <a href="missing_callback.php" class="active" style="color:#38bdf8;font-weight:700;">⚡ Missing Callback</a>
+        <a href="missing_callback.php" class="active">Missing Callback</a>
         <a href="reports.php">Reports</a>
         <a href="messages.php">Messages</a>
         <a href="logout.php">Logout</a>
