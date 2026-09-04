@@ -14,7 +14,7 @@ function sendOTP($toEmail, $otp)
     try {
 
         $smtpUser = getenv('SMTP_USER') ?: (getenv('GMAIL_USER') ?: 'mohanraj.s4211@gmail.com');
-        $smtpPass = getenv('SMTP_PASSWORD') ?: (getenv('GMAIL_APP_PASSWORD') ?: 'ssib ifjd ifln vcls');
+        $smtpPass = getenv('SMTP_PASSWORD') ?: (getenv('GMAIL_APP_PASSWORD') ?: 'dwrl umti zupw wnzb');
 
         $mail->isSMTP();
         $mail->Host = getenv('SMTP_HOST') ?: "smtp.gmail.com";
@@ -97,7 +97,7 @@ function sendOrderInvoiceEmail($orderId, $conn)
     $mail = new PHPMailer(true);
     try {
         $smtpUser = getenv('SMTP_USER') ?: (getenv('GMAIL_USER') ?: 'mohanraj.s4211@gmail.com');
-        $smtpPass = getenv('SMTP_PASSWORD') ?: (getenv('GMAIL_APP_PASSWORD') ?: 'ssib ifjd ifln vcls');
+        $smtpPass = getenv('SMTP_PASSWORD') ?: (getenv('GMAIL_APP_PASSWORD') ?: 'dwrl umti zupw wnzb');
 
         $mail->isSMTP();
         $mail->Host = getenv('SMTP_HOST') ?: "smtp.gmail.com";
