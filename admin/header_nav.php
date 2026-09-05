@@ -39,6 +39,9 @@ if (!isset($activePage)) {
         <a href="messages.php" class="<?php echo in_array($activePage, ['messages', 'view_message']) ? 'active' : ''; ?>">
             <i class="fa-solid fa-envelope"></i> Messages
         </a>
+        <a href="profile.php" class="<?php echo $activePage === 'profile' ? 'active' : ''; ?>">
+            <i class="fa-solid fa-user-gear"></i> Settings
+        </a>
         <span class="nav-status-badge" title="Live Canteen System Online">
             <i class="fa-solid fa-circle" style="font-size:8px; color:#34d399;"></i> Live
         </span>

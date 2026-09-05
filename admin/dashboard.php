@@ -66,7 +66,10 @@ $activePage = 'dashboard';
             </h1>
             <p class="admin-subtitle">Live analytics & order management for Canteen</p>
         </div>
-        <div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <a href="profile.php" class="btn-material btn-primary" style="background:#0284c7; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-user-gear"></i> Admin Profile & Password
+            </a>
             <a href="orders.php" class="btn-material btn-orange">
                 <i class="fa-solid fa-bell-concierge"></i> Kitchen Live Orders
             </a>
