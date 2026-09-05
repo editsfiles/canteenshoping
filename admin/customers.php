@@ -96,7 +96,7 @@ $activePage = 'customers';
                         <th>Register No</th>
                         <th>Department</th>
                         <th>Email Address</th>
-                        <th style="text-align:right; width:160px;">Actions</th>
+                        <th style="text-align:right; width:250px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -122,11 +122,14 @@ $activePage = 'customers';
                                     <i class="fa-regular fa-envelope" style="margin-right:4px;"></i><?php echo htmlspecialchars($row['email']); ?>
                                 </span>
                             </td>
-                            <td style="text-align:right;">
-                                <a href="customer_details.php?id=<?php echo $row['id']; ?>" class="btn-material btn-primary" style="padding:6px 12px; font-size:12px; margin-right:4px;">
+                            <td style="text-align:right; white-space:nowrap;">
+                                <a href="customer_details.php?id=<?php echo $row['id']; ?>#securitySection" class="btn-material btn-primary" style="padding:6px 10px; font-size:12px; background:#0284c7; margin-right:4px;" title="Change Username or Password">
+                                    <i class="fa-solid fa-key"></i> Edit / Password
+                                </a>
+                                <a href="customer_details.php?id=<?php echo $row['id']; ?>" class="btn-material btn-primary" style="padding:6px 10px; font-size:12px; margin-right:4px;">
                                     <i class="fa-solid fa-eye"></i> Details
                                 </a>
-                                <a href="customers.php?delete=<?php echo $row['id']; ?>" class="btn-material btn-danger" style="padding:6px 12px; font-size:12px;" onclick="return confirm('Delete this customer and all associated orders?');">
+                                <a href="customers.php?delete=<?php echo $row['id']; ?>" class="btn-material btn-danger" style="padding:6px 10px; font-size:12px;" onclick="return confirm('Delete this customer and all associated orders?');">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                             </td>
