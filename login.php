@@ -97,7 +97,8 @@ display:flex;
 justify-content:center;
 align-items:center;
 min-height:100vh;
-overflow:hidden;
+overflow-y:auto;
+padding:25px 12px;
 
 background:linear-gradient(-45deg,#00c853,#00e676,#00bcd4,#1de9b6);
 background-size:400% 400%;
@@ -115,7 +116,8 @@ animation:bgMove 12s ease infinite;
 
 .login-box{
 
-width:420px;
+width:100%;
+max-width:420px;
 padding:40px;
 border-radius:20px;
 
@@ -269,9 +271,29 @@ text-decoration:underline;
 
 .login-box{
 
-width:90%;
-padding:30px;
+width:100%;
+max-width:380px;
+padding:26px 20px;
 
+}
+
+.logo{
+font-size:48px;
+}
+
+h2{
+font-size:22px;
+margin-bottom:20px;
+}
+
+.input-box input{
+padding:13px 45px;
+font-size:15px;
+}
+
+button{
+padding:13px;
+font-size:16px;
 }
 
 }

@@ -708,40 +708,59 @@ nav a:hover {
 @media (max-width: 800px) {
 
     header {
-
         flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px 14px;
+    }
 
-        gap: 12px;
-
-        padding: 15px;
+    header h2 {
+        font-size: 18px;
+        text-align: center;
     }
 
     nav {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 8px;
+        padding: 4px 0 2px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
 
-        flex-wrap: wrap;
+    nav::-webkit-scrollbar {
+        display: none;
+    }
 
-        justify-content: center;
+    nav a {
+        font-size: 13px;
+        padding: 6px 14px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        display: inline-block;
+        flex-shrink: 0;
+        text-decoration: none;
+        font-weight: 600;
+    }
 
-        gap: 13px;
+    nav a::after {
+        display: none;
     }
 
     .contact-wrapper {
-
         grid-template-columns: 1fr;
-
-        width: 92%;
-
-        margin: 30px auto;
+        width: 95%;
+        margin: 15px auto 40px;
+        border-radius: 14px;
     }
 
     .contact-info {
-
-        padding: 35px 25px;
+        padding: 24px 18px;
     }
 
     .contact-form {
-
-        padding: 35px 25px;
+        padding: 24px 18px;
     }
 }
 
@@ -753,18 +772,22 @@ nav a:hover {
 @media (max-width: 450px) {
 
     .contact-info h1 {
-
-        font-size: 28px;
+        font-size: 22px;
     }
 
     .contact-form h2 {
-
-        font-size: 25px;
+        font-size: 20px;
     }
 
-    nav a {
-
+    .form-group input,
+    .form-group textarea {
         font-size: 14px;
+        padding: 11px 12px;
+    }
+
+    .send-button {
+        padding: 12px;
+        font-size: 15px;
     }
 }
 

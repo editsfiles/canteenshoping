@@ -337,6 +337,10 @@ body {
 
     line-height: 1.6;
 
+    word-break: break-all;
+
+    overflow-wrap: anywhere;
+
 }
 
 
@@ -595,17 +599,23 @@ body {
 
     body {
 
-        padding: 10px;
+        padding: 8px 6px 30px;
+
+    }
+
+    .invoice {
+
+        border-radius: 8px;
 
     }
 
     .invoice-header {
 
-        padding: 25px 20px;
+        padding: 20px 14px;
 
         flex-direction: column;
 
-        gap: 20px;
+        gap: 12px;
 
         text-align: center;
 
@@ -617,9 +627,15 @@ body {
 
     }
 
+    .invoice-title h2 {
+
+        font-size: 24px;
+
+    }
+
     .invoice-body {
 
-        padding: 25px 20px;
+        padding: 16px 12px;
 
     }
 
@@ -627,11 +643,59 @@ body {
 
         grid-template-columns: 1fr;
 
+        gap: 12px;
+
+        margin-bottom: 20px;
+
+    }
+
+    .info-box {
+
+        padding: 14px;
+
+    }
+
+    .info-box p {
+
+        font-size: 14px;
+
+        word-break: break-all;
+
+        overflow-wrap: anywhere;
+
+    }
+
+    .table-wrapper {
+
+        overflow-x: auto;
+
+        -webkit-overflow-scrolling: touch;
+
+        margin-top: 10px;
+
+    }
+
+    .invoice-table th,
+
+    .invoice-table td {
+
+        padding: 10px 6px;
+
+        font-size: 13px;
+
     }
 
     .total-section {
 
         width: 100%;
+
+        margin-top: 16px;
+
+    }
+
+    .total-row.grand-total {
+
+        font-size: 19px;
 
     }
 
@@ -639,11 +703,17 @@ body {
 
         flex-direction: column;
 
+        gap: 10px;
+
     }
 
     .btn {
 
+        width: 100%;
+
         text-align: center;
+
+        padding: 12px 14px;
 
     }
 
@@ -795,6 +865,8 @@ body {
 
 <!-- ORDER DETAILS -->
 
+<div class="table-wrapper">
+
 <table class="invoice-table">
 
 <thead>
@@ -849,6 +921,8 @@ body {
 </tbody>
 
 </table>
+
+</div>
 
 
 <!-- TOTAL -->

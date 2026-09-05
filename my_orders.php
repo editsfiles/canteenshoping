@@ -108,6 +108,13 @@ foreach ($possibleDateColumns as $column) {
     }
 }
 
+// Fetch all orders into array for dual desktop / mobile rendering
+$orders = [];
+while ($r = mysqli_fetch_assoc($result)) {
+    $orders[] = $r;
+}
+mysqli_stmt_close($stmt);
+
 ?>
 
 <!DOCTYPE html>
@@ -358,19 +365,190 @@ foreach ($possibleDateColumns as $column) {
 }
 
 /* =========================================================
-   TABLE RESPONSIVE
+   DESKTOP VS MOBILE SYSTEM
    ========================================================= */
 
-@media (max-width: 900px) {
+.desktop-orders-table {
+    display: block;
+}
 
-    .table-container {
-        overflow-x: auto;
+.mobile-orders-list {
+    display: none;
+}
+
+/* Mobile Order Card Component */
+.mobile-order-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-order-card:active {
+    transform: scale(0.99);
+}
+
+.mobile-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-order-id {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.mobile-card-time {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.mobile-card-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-top: 2px;
+    border: 1px solid #f1f5f9;
+}
+
+.mobile-amount {
+    font-size: 19px;
+    font-weight: 800;
+    color: #16a34a;
+}
+
+.mobile-pay-badge {
+    font-size: 12px;
+    color: #475569;
+    font-weight: 600;
+}
+
+.mobile-refund-alert {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mobile-actions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.mobile-act-btn {
+    flex: 1 1 auto;
+    min-width: 110px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+    box-sizing: border-box;
+}
+
+.btn-invoice {
+    background: #3498db;
+    color: white;
+}
+
+.btn-pay {
+    background: #16a34a;
+    color: white;
+}
+
+.btn-bank {
+    background: linear-gradient(90deg, #6a11cb, #2575fc);
+    color: white;
+}
+
+.btn-cancel {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    width: 100%;
+}
+
+.btn-cancel:hover {
+    background: #fecaca;
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 12px auto !important;
+        padding: 0 10px !important;
     }
 
-    table {
-        min-width: 950px;
+    .desktop-orders-table {
+        display: none !important;
     }
 
+    .mobile-orders-list {
+        display: flex !important;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .timezone-banner {
+        padding: 12px 14px !important;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        border-radius: 12px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .tz-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .tz-clock-pill {
+        font-size: 12px !important;
+        padding: 5px 10px !important;
+    }
+
+    .tz-today-badge {
+        font-size: 11px !important;
+        padding: 5px 10px !important;
+    }
+
+    .btn {
+        display: block !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
 }
 
 </style>
@@ -443,10 +621,9 @@ foreach ($possibleDateColumns as $column) {
 </div>
 
 <?php if (!empty($cancelMsg)) echo $cancelMsg; ?>
-
 <?php
 
-if (mysqli_num_rows($result) == 0) {
+if (empty($orders)) {
 
 ?>
 
@@ -460,20 +637,15 @@ if (mysqli_num_rows($result) == 0) {
             🛒
         </div>
 
-
         <h2>
             No Orders Found
         </h2>
 
-
         <p style="margin-top:10px;color:#777;">
-
             You have not placed any orders yet.
-
         </p>
 
     </div>
-
 
 <?php
 
@@ -481,391 +653,142 @@ if (mysqli_num_rows($result) == 0) {
 
 ?>
 
-
 <!-- =========================================================
-     ORDERS TABLE
+     DESKTOP ORDERS TABLE (> 768px)
      ========================================================= -->
 
-<div class="table-container">
+<div class="desktop-orders-table table-container">
 
 <table>
 
 <thead>
 
 <tr>
-
     <th>Order ID</th>
-
     <th>Total</th>
-
     <th>Payment</th>
-
     <th>Payment ID</th>
-
     <th>Status</th>
-
     <th><i class="fa-regular fa-clock"></i> Order Time (IST)</th>
-
     <th>Invoice</th>
-
     <th>Action</th>
-
 </tr>
 
 </thead>
 
-
 <tbody>
-
 
 <?php
 
-while ($row = mysqli_fetch_assoc($result)) {
-
-
-    // =====================================================
-    // ORDER ID
-    // =====================================================
-
-    $orderId = isset($row['id'])
-        ? (int)$row['id']
-        : 0;
-
-
-    // =====================================================
-    // TOTAL AMOUNT
-    // =====================================================
-
-    $totalAmount = isset($row['total_amount'])
-        ? (float)$row['total_amount']
-        : 0;
-
-
-    // =====================================================
-    // PAYMENT METHOD
-    // =====================================================
-
-    $paymentMethod = isset($row['payment_method'])
-        ? $row['payment_method']
-        : "N/A";
-
-
-    // =====================================================
-    // PAYMENT ID
-    // =====================================================
-
-    $paymentId = isset($row['payment_id'])
-        ? $row['payment_id']
-        : "N/A";
-
-
-    // =====================================================
-    // STATUS
-    // =====================================================
-
-    $status = isset($row['status'])
-        ? $row['status']
-        : "Pending";
-
-
-    // =====================================================
-    // STATUS CSS CLASS
-    // =====================================================
+foreach ($orders as $row) {
+    $orderId = isset($row['id']) ? (int)$row['id'] : 0;
+    $totalAmount = isset($row['total_amount']) ? (float)$row['total_amount'] : 0;
+    $paymentMethod = isset($row['payment_method']) ? $row['payment_method'] : "N/A";
+    $paymentId = isset($row['payment_id']) ? $row['payment_id'] : "N/A";
+    $status = isset($row['status']) ? $row['status'] : "Pending";
 
     $class = "pending";
-
-
     switch (strtolower(trim($status))) {
-
-        case "paid":
-
-            $class = "paid";
-
-            break;
-
-
-        case "preparing":
-
-            $class = "preparing";
-
-            break;
-
-
-        case "completed":
-
-            $class = "completed";
-
-            break;
-
-
+        case "paid": $class = "paid"; break;
+        case "preparing": $class = "preparing"; break;
+        case "completed": $class = "completed"; break;
         case "cancelled":
-
-        case "canceled":
-
-            $class = "cancelled";
-
-            break;
-
-
-        case "failed":
-
-            $class = "failed";
-
-            break;
-
-
-        default:
-
-            $class = "pending";
-
-            break;
+        case "canceled": $class = "cancelled"; break;
+        case "failed": $class = "failed"; break;
+        default: $class = "pending"; break;
     }
 
-
-    // =====================================================
-    // ORDER DATE
-    // =====================================================
-
-    if (
-        $dateColumn !== null &&
-        isset($row[$dateColumn]) &&
-        !empty($row[$dateColumn])
-    ) {
-
-        $orderDate = $row[$dateColumn];
-
-    } else {
-
-        $orderDate = "N/A";
-
+    $orderDate = ($dateColumn !== null && isset($row[$dateColumn]) && !empty($row[$dateColumn])) ? $row[$dateColumn] : "N/A";
+    $formattedDate = "N/A";
+    $formattedTime = "";
+    $timeAgo = "";
+    if ($orderDate !== "N/A" && !empty($orderDate)) {
+        $ts = strtotime($orderDate);
+        if ($ts !== false) {
+            $formattedDate = date("d M Y", $ts);
+            $formattedTime = date("h:i A", $ts);
+            $diff = time() - $ts;
+            if ($diff < 60) {
+                $timeAgo = "Just now";
+            } elseif ($diff < 3600) {
+                $timeAgo = floor($diff / 60) . " mins ago";
+            } elseif ($diff < 86400) {
+                $timeAgo = floor($diff / 3600) . " hrs ago";
+            } else {
+                $timeAgo = floor($diff / 86400) . " days ago";
+            }
+        } else {
+            $formattedDate = $orderDate;
+        }
     }
 
+    $foodSt = strtolower(trim($row['food_status'] ?? ''));
+    $orderSt = strtolower(trim($status));
+    $isCancelled = in_array($orderSt, ['cancelled', 'canceled', 'failed'], true);
+    $isDelivered = ($foodSt === 'delivered');
 ?>
 
-
 <tr>
-
-
-    <!-- =================================================
-         ORDER ID
-         ================================================= -->
-
+    <td><strong>#<?php echo htmlspecialchars((string)$orderId); ?></strong></td>
+    <td><strong style="color:#27ae60;">₹<?php echo number_format($totalAmount, 2); ?></strong></td>
     <td>
-
-        <strong>
-
-            #<?php
-            echo htmlspecialchars((string)$orderId);
-            ?>
-
-        </strong>
-
+        <?php if (strtolower(trim($paymentMethod)) === "uropay"): ?>
+            <span class="payment-uropay">📱 UroPay</span>
+        <?php else: ?>
+            <?php echo htmlspecialchars($paymentMethod); ?>
+        <?php endif; ?>
     </td>
-
-
-
-    <!-- =================================================
-         TOTAL
-         ================================================= -->
-
-    <td>
-
-        <strong style="color:#27ae60;">
-
-            ₹<?php
-            echo number_format($totalAmount, 2);
-            ?>
-
-        </strong>
-
-    </td>
-
-
-
-    <!-- =================================================
-         PAYMENT
-         ================================================= -->
-
-    <td>
-
-        <?php
-
-        if (strtolower(trim($paymentMethod)) === "uropay") {
-
-            echo '<span class="payment-uropay">📱 UroPay</span>';
-
-        } else {
-
-            echo htmlspecialchars($paymentMethod);
-
-        }
-
-        ?>
-
-    </td>
-
-
-
-    <!-- =================================================
-         PAYMENT ID
-         ================================================= -->
-
     <td style="white-space:nowrap;">
-
         <?php if ($paymentId !== "N/A" && $paymentId !== ""): ?>
-
             <span style="display:block; font-size:12px; color:#888; margin-bottom:5px;">
                 <?php echo htmlspecialchars($paymentId); ?>
             </span>
-
-            <a
-                href="verify_ref.php?ref=<?php echo urlencode($paymentId); ?>"
-                target="_blank"
-                title="Check bank payment status for this Ref ID"
-                style="
-                    display:inline-flex;
-                    align-items:center;
-                    gap:5px;
-                    background:linear-gradient(90deg,#6a11cb,#2575fc);
-                    color:white;
-                    padding:5px 13px;
-                    border-radius:20px;
-                    font-size:12px;
-                    font-weight:600;
-                    text-decoration:none;
-                "
-            >
+            <a href="verify_ref.php?ref=<?php echo urlencode($paymentId); ?>" target="_blank" title="Check bank payment status for this Ref ID" style="display:inline-flex; align-items:center; gap:5px; background:linear-gradient(90deg,#6a11cb,#2575fc); color:white; padding:5px 13px; border-radius:20px; font-size:12px; font-weight:600; text-decoration:none;">
                 ⚡ Check Bank Status
             </a>
-
         <?php else: ?>
-
             <span style="color:#ccc;">—</span>
-
         <?php endif; ?>
-
     </td>
-
-
-
-    <!-- =================================================
-         STATUS
-         ================================================= -->
-
     <td>
-
-        <span class="status <?php echo $class; ?>">
-            <?php echo htmlspecialchars($status); ?>
-        </span>
-
-        <?php if (in_array(strtolower(trim($status)), ['cancelled', 'canceled', 'failed'], true)): ?>
+        <span class="status <?php echo $class; ?>"><?php echo htmlspecialchars($status); ?></span>
+        <?php if ($isCancelled): ?>
             <div style="font-size:11px; color:#b91c1c; font-weight:700; margin-top:5px; line-height:1.3;">
                 <i class="fa-solid fa-bolt" style="color:#d97706;"></i> Refund in 10 mins
             </div>
         <?php endif; ?>
-
     </td>
-
-
-
-    <!-- =================================================
-         DATE & REAL TIME ZONE
-         ================================================= -->
-
     <td>
-
-        <?php
-        if ($orderDate !== "N/A" && !empty($orderDate)) {
-            $ts = strtotime($orderDate);
-            if ($ts !== false) {
-                $formattedDate = date("d M Y", $ts);
-                $formattedTime = date("h:i A", $ts);
-                
-                // Relative time calculation
-                $diff = time() - $ts;
-                if ($diff < 60) {
-                    $timeAgo = "Just now";
-                } elseif ($diff < 3600) {
-                    $timeAgo = floor($diff / 60) . " mins ago";
-                } elseif ($diff < 86400) {
-                    $timeAgo = floor($diff / 3600) . " hrs ago";
-                } else {
-                    $timeAgo = floor($diff / 86400) . " days ago";
-                }
-                ?>
-                <div class="order-time-wrapper">
-                    <div class="order-date-primary"><?php echo htmlspecialchars($formattedDate); ?></div>
-                    <div class="order-time-secondary">
-                        <span><?php echo htmlspecialchars($formattedTime); ?></span>
-                        <span class="badge-ist-pill" title="Indian Standard Time (UTC+05:30)">IST</span>
-                    </div>
-                    <span class="badge-time-ago"><i class="fa-solid fa-clock-rotate-left"></i> <?php echo htmlspecialchars($timeAgo); ?></span>
+        <?php if ($formattedDate !== "N/A"): ?>
+            <div class="order-time-wrapper">
+                <div class="order-date-primary"><?php echo htmlspecialchars($formattedDate); ?></div>
+                <div class="order-time-secondary">
+                    <span><?php echo htmlspecialchars($formattedTime); ?></span>
+                    <span class="badge-ist-pill" title="Indian Standard Time (UTC+05:30)">IST</span>
                 </div>
-                <?php
-            } else {
-                echo htmlspecialchars($orderDate) . ' <span class="badge-ist-pill">IST</span>';
-            }
-        } else {
-            echo '<span style="color:#999;">N/A</span>';
-        }
-        ?>
-
+                <?php if (!empty($timeAgo)): ?>
+                    <span class="badge-time-ago"><i class="fa-solid fa-clock-rotate-left"></i> <?php echo htmlspecialchars($timeAgo); ?></span>
+                <?php endif; ?>
+            </div>
+        <?php else: ?>
+            <span style="color:#999;">N/A</span>
+        <?php endif; ?>
     </td>
-
-
-
-    <!-- =================================================
-         VIEW INVOICE
-         ================================================= -->
-
     <td>
-
-        <?php if (strtolower($status) === 'pending' && !empty($paymentId) && $paymentId !== 'N/A') { ?>
-
-            <a
-                href="uropay_payment.php?order_id=<?php echo urlencode($paymentId); ?>&local_id=<?php echo $orderId; ?>"
-                class="invoice-btn"
-                style="background:#27ae60; margin-bottom:5px; display:inline-block;"
-            >
+        <?php if (strtolower($status) === 'pending' && !empty($paymentId) && $paymentId !== 'N/A'): ?>
+            <a href="uropay_payment.php?order_id=<?php echo urlencode($paymentId); ?>&local_id=<?php echo $orderId; ?>" class="invoice-btn" style="background:#27ae60; margin-bottom:5px; display:inline-block;">
                 ⚡ Verify / Pay
-            </a>
-            <br>
-
-        <?php } ?>
-
-        <?php if ($orderId > 0) { ?>
-
-            <a
-                href="invoice.php?order_id=<?php echo $orderId; ?>"
-                class="invoice-btn"
-                target="_blank"
-            >
+            </a><br>
+        <?php endif; ?>
+        <?php if ($orderId > 0): ?>
+            <a href="invoice.php?order_id=<?php echo $orderId; ?>" class="invoice-btn" target="_blank">
                 🧾 View Invoice
             </a>
-
-        <?php } else { ?>
-
-            <span style="color:#999;">
-                N/A
-            </span>
-
-        <?php } ?>
-
+        <?php else: ?>
+            <span style="color:#999;">N/A</span>
+        <?php endif; ?>
     </td>
-
-
-    <!-- =================================================
-         ACTION / CANCEL ORDER & 24-48 HR REFUND
-         ================================================= -->
-
     <td>
-        <?php 
-        $foodSt = strtolower(trim($row['food_status'] ?? ''));
-        $orderSt = strtolower(trim($status));
-        $isCancelled = in_array($orderSt, ['cancelled', 'canceled', 'failed'], true);
-        $isDelivered = ($foodSt === 'delivered');
-        ?>
-
         <?php if ($isCancelled): ?>
             <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#b91c1c; font-weight:600; padding:5px 10px; background:#fee2e2; border-radius:6px; border:1px solid #fecaca; white-space:nowrap;">
                 <i class="fa-solid fa-bolt"></i> Auto-Refund in 10 mins
@@ -883,29 +806,160 @@ while ($row = mysqli_fetch_assoc($result)) {
             </span>
         <?php endif; ?>
     </td>
-
-
 </tr>
 
-
 <?php
-
 }
-
 ?>
 
-
 </tbody>
-
 </table>
+</div>
+
+<!-- =========================================================
+     MOBILE ORDER CARDS (<= 768px)
+     ========================================================= -->
+
+<div class="mobile-orders-list">
+
+<?php
+foreach ($orders as $row) {
+    $orderId = isset($row['id']) ? (int)$row['id'] : 0;
+    $totalAmount = isset($row['total_amount']) ? (float)$row['total_amount'] : 0;
+    $paymentMethod = isset($row['payment_method']) ? $row['payment_method'] : "N/A";
+    $paymentId = isset($row['payment_id']) ? $row['payment_id'] : "N/A";
+    $status = isset($row['status']) ? $row['status'] : "Pending";
+
+    $class = "pending";
+    switch (strtolower(trim($status))) {
+        case "paid": $class = "paid"; break;
+        case "preparing": $class = "preparing"; break;
+        case "completed": $class = "completed"; break;
+        case "cancelled":
+        case "canceled": $class = "cancelled"; break;
+        case "failed": $class = "failed"; break;
+        default: $class = "pending"; break;
+    }
+
+    $orderDate = ($dateColumn !== null && isset($row[$dateColumn]) && !empty($row[$dateColumn])) ? $row[$dateColumn] : "N/A";
+    $formattedDate = "N/A";
+    $formattedTime = "";
+    $timeAgo = "";
+    if ($orderDate !== "N/A" && !empty($orderDate)) {
+        $ts = strtotime($orderDate);
+        if ($ts !== false) {
+            $formattedDate = date("d M Y", $ts);
+            $formattedTime = date("h:i A", $ts);
+            $diff = time() - $ts;
+            if ($diff < 60) {
+                $timeAgo = "Just now";
+            } elseif ($diff < 3600) {
+                $timeAgo = floor($diff / 60) . " mins ago";
+            } elseif ($diff < 86400) {
+                $timeAgo = floor($diff / 3600) . " hrs ago";
+            } else {
+                $timeAgo = floor($diff / 86400) . " days ago";
+            }
+        } else {
+            $formattedDate = $orderDate;
+        }
+    }
+
+    $foodSt = strtolower(trim($row['food_status'] ?? ''));
+    $orderSt = strtolower(trim($status));
+    $isCancelled = in_array($orderSt, ['cancelled', 'canceled', 'failed'], true);
+    $isDelivered = ($foodSt === 'delivered');
+?>
+
+    <div class="mobile-order-card">
+        <div class="mobile-card-top">
+            <div class="mobile-order-id">
+                <i class="fa-solid fa-receipt" style="color:#27ae60; margin-right:4px;"></i> Order #<?php echo $orderId; ?>
+            </div>
+            <span class="status <?php echo $class; ?>">
+                <?php echo htmlspecialchars($status); ?>
+            </span>
+        </div>
+
+        <div class="mobile-card-time">
+            <span><i class="fa-regular fa-calendar" style="color:#64748b;"></i> <?php echo htmlspecialchars($formattedDate); ?><?php if (!empty($formattedTime)): ?>, <?php echo htmlspecialchars($formattedTime); ?><?php endif; ?></span>
+            <span class="badge-ist-pill">IST</span>
+            <?php if (!empty($timeAgo)): ?>
+                <span class="badge-time-ago"><i class="fa-solid fa-clock-rotate-left"></i> <?php echo htmlspecialchars($timeAgo); ?></span>
+            <?php endif; ?>
+        </div>
+
+        <div class="mobile-card-details">
+            <div>
+                <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">Total Bill</div>
+                <div class="mobile-amount">₹<?php echo number_format($totalAmount, 2); ?></div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">Payment</div>
+                <div class="mobile-pay-badge">
+                    <?php if (strtolower(trim($paymentMethod)) === "uropay"): ?>
+                        <span class="payment-uropay" style="padding:3px 8px; font-size:11px;">📱 UroPay</span>
+                    <?php else: ?>
+                        <?php echo htmlspecialchars($paymentMethod); ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <?php if ($paymentId !== "N/A" && $paymentId !== ""): ?>
+            <div style="font-size:11px; color:#64748b; word-break:break-all; background:#f1f5f9; padding:6px 10px; border-radius:8px;">
+                <strong>Ref ID:</strong> <?php echo htmlspecialchars($paymentId); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($isCancelled): ?>
+            <div class="mobile-refund-alert">
+                <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> Auto-Refund in 10 mins to source UPI
+            </div>
+        <?php endif; ?>
+
+        <div class="mobile-actions-bar">
+            <?php if ($orderId > 0): ?>
+                <a href="invoice.php?order_id=<?php echo $orderId; ?>" class="mobile-act-btn btn-invoice" target="_blank">
+                    <i class="fa-solid fa-file-invoice"></i> Invoice
+                </a>
+            <?php endif; ?>
+
+            <?php if (strtolower($status) === 'pending' && !empty($paymentId) && $paymentId !== 'N/A'): ?>
+                <a href="uropay_payment.php?order_id=<?php echo urlencode($paymentId); ?>&local_id=<?php echo $orderId; ?>" class="mobile-act-btn btn-pay">
+                    ⚡ Verify / Pay
+                </a>
+            <?php endif; ?>
+
+            <?php if ($paymentId !== "N/A" && $paymentId !== ""): ?>
+                <a href="verify_ref.php?ref=<?php echo urlencode($paymentId); ?>" target="_blank" class="mobile-act-btn btn-bank">
+                    ⚡ Check Bank
+                </a>
+            <?php endif; ?>
+
+            <?php if (!$isCancelled && !$isDelivered): ?>
+                <form method="POST" style="margin:0; flex:1 1 100%;" onsubmit="return confirm('Cancel Order #<?php echo $orderId; ?>?\n\nIf already paid, total of ₹<?php echo number_format($totalAmount, 2); ?> will be refunded within 10 minutes.');">
+                    <input type="hidden" name="cancel_order_id" value="<?php echo $orderId; ?>">
+                    <button type="submit" class="mobile-act-btn btn-cancel">
+                        <i class="fa-solid fa-xmark"></i> Cancel Order
+                    </button>
+                </form>
+            <?php elseif ($isDelivered): ?>
+                <div style="width:100%; text-align:center; font-size:12px; color:#15803d; font-weight:700; padding:4px 0;">
+                    <i class="fa-solid fa-circle-check"></i> Order Delivered
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+<?php
+}
+?>
 
 </div>
 
-
 <?php
-
 }
-
 ?>
 
 

@@ -266,7 +266,7 @@ nav a:hover {
 
 .search-box input {
     flex: 1;
-    min-width: 250px;
+    min-width: 0;
     padding: 14px 18px;
     border: 2px solid #e0e0e0;
     border-radius: 12px;
@@ -1999,28 +1999,163 @@ tr:hover {
 
     nav a {
         font-size: 13px;
-        padding: 5px 12px;
-        background: rgba(255, 255, 255, 0.15);
+        padding: 6px 14px;
+        background: rgba(255, 255, 255, 0.2);
         border-radius: 8px;
         display: inline-block;
         flex-shrink: 0;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 10px;
+        margin: 15px auto;
     }
 }
 
-@media (max-width: 450px) {
+/* Mobile Food Grid & Search & Home Layout */
+@media (max-width: 640px) {
+    .search-box {
+        margin: 15px auto 20px;
+        padding: 0 4px;
+    }
+
+    .search-box form {
+        gap: 8px;
+    }
+
+    .search-box input {
+        min-width: 0;
+        padding: 11px 14px;
+        font-size: 14px;
+        border-radius: 10px;
+    }
+
+    .search-box button {
+        padding: 11px 18px;
+        font-size: 14px;
+        border-radius: 10px;
+        white-space: nowrap;
+    }
+
+    /* 2-Column Responsive Food Grid on Mobile */
+    .products {
+        width: 100%;
+        max-width: 100%;
+        padding: 8px 4px 40px;
+        gap: 12px;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .products .card {
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .products .card img {
+        height: 120px;
+    }
+
+    .products .card h3 {
+        font-size: 15px;
+        margin: 8px 8px 4px;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .products .card p {
+        margin: 0 8px 6px;
+        font-size: 11px;
+        line-height: 1.3;
+        min-height: auto;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .price {
+        font-size: 16px;
+        padding: 4px 12px;
+        margin: 4px 0 8px;
+        border-radius: 20px;
+    }
+
+    .qty-box {
+        margin: 6px 8px;
+        padding: 4px 6px;
+        gap: 6px;
+        border-radius: 8px;
+    }
+
+    .qty-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 15px;
+        border-radius: 6px;
+    }
+
+    .qty-box input {
+        width: 34px;
+        height: 28px;
+        font-size: 13px;
+    }
+
+    .products form button[type="submit"] {
+        width: calc(100% - 16px);
+        margin: 0 8px 12px;
+        padding: 9px 4px;
+        font-size: 12px;
+        border-radius: 8px;
+    }
+
+    /* Home Page Categories 2-Column Grid */
+    .categories {
+        padding: 12px 8px 30px;
+        gap: 10px;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .categories .card {
+        padding: 14px 10px;
+        border-radius: 12px;
+    }
+
+    .categories .card h3 {
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+
+    .categories .card p {
+        font-size: 11px;
+    }
+
+    .hero {
+        padding: 30px 14px;
+    }
+
     .hero h1 {
         font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .hero p {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .hero a {
+        padding: 10px 20px;
+        font-size: 15px;
     }
 
     .section-title {
-        font-size: 22px;
-    }
-
-    .food-card img {
-        height: 160px;
-    }
-
-    .contact-container {
-        padding: 16px;
+        font-size: 20px;
+        margin: 15px 0 10px;
     }
 }

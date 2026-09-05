@@ -85,21 +85,25 @@ background:#f4f6f9;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
+min-height:100vh;
+overflow-y:auto;
+padding:25px 12px;
 }
 
 .container{
-width:420px;
+width:100%;
+max-width:440px;
 background:#fff;
-padding:30px;
-border-radius:10px;
-box-shadow:0 0 10px rgba(0,0,0,.2);
+padding:30px 24px;
+border-radius:14px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 
 h2{
 text-align:center;
 margin-bottom:20px;
 color:#2c3e50;
+font-size:24px;
 }
 
 .form-group{
@@ -108,26 +112,42 @@ margin-bottom:15px;
 
 label{
 display:block;
-margin-bottom:5px;
+margin-bottom:6px;
 font-weight:bold;
+font-size:14px;
+color:#334155;
 }
 
-input{
+input, select{
 width:100%;
-padding:10px;
-border:1px solid #ccc;
-border-radius:5px;
+padding:11px 14px;
+border:1.5px solid #cbd5e1;
+border-radius:8px;
+font-size:15px;
+outline:none;
+background:#fafafa;
+transition:0.2s ease;
+box-sizing:border-box;
+}
+
+input:focus, select:focus{
+border-color:#27ae60;
+background:#fff;
+box-shadow:0 0 0 3px rgba(39,174,96,0.12);
 }
 
 button{
 width:100%;
-padding:12px;
+padding:13px;
 background:#27ae60;
 color:white;
 border:none;
-border-radius:5px;
+border-radius:8px;
 font-size:16px;
+font-weight:700;
 cursor:pointer;
+transition:0.2s ease;
+margin-top:5px;
 }
 
 button:hover{
@@ -136,7 +156,17 @@ background:#219150;
 
 .login-link{
 text-align:center;
-margin-top:15px;
+margin-top:16px;
+font-size:14px;
+}
+
+@media(max-width:480px){
+.container{
+padding:22px 18px;
+}
+h2{
+font-size:21px;
+}
 }
 
 </style>
