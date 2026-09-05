@@ -532,6 +532,7 @@ $paymentId =
 $status =
     "Pending";
 
+$upiId = defined('CANTEEN_UPI_ID') ? CANTEEN_UPI_ID : "9952611859@slc";
 
 $stmt = mysqli_prepare(
     $conn,
@@ -542,11 +543,12 @@ $stmt = mysqli_prepare(
         payment_id,
         merchant_order_id,
         payment_method,
+        upi_id,
         qr_code,
         status,
         order_date
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, NOW())"
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
 );
 
 if (!$stmt) {
@@ -558,12 +560,13 @@ if (!$stmt) {
 
 mysqli_stmt_bind_param(
     $stmt,
-    "idsssss",
+    "idssssss",
     $user_id,
     $grandTotal,
     $paymentId,
     $merchantOrderId,
     $paymentMethod,
+    $upiId,
     $qrCode,
     $status
 );

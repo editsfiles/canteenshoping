@@ -85,6 +85,7 @@ CREATE TABLE `orders` (
   `bank_utr` varchar(100) DEFAULT NULL,
   `merchant_order_id` varchar(255) DEFAULT NULL,
   `payment_method` varchar(100) DEFAULT 'UroPay',
+  `upi_id` varchar(100) DEFAULT '9952611859@slc',
   `qr_code` mediumtext DEFAULT NULL,
   `status` varchar(50) NOT NULL DEFAULT 'Pending',
   `food_status` varchar(50) NOT NULL DEFAULT 'Preparing',

@@ -66,7 +66,7 @@ A full-featured College Canteen Management System built with PHP and MySQL. Incl
 * **Payment Gateway & Merchant UPI ID**: Configured in `config_uropay.php`:
   ```php
   define("UROPAY_API_KEY", "YOUR_API_KEY");
-  define("CANTEEN_UPI_ID", "canteen@upi");
+  define("CANTEEN_UPI_ID", "9952611859@slc");
   ```
 
 ---

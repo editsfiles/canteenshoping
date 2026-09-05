@@ -8,11 +8,14 @@ include("config_uropay.php");
 // Resolve order ID from GET or session
 $uroPayOrderId = trim($_GET['order_id'] ?? ($_SESSION['uropay_order_id'] ?? ''));
 $localOrderId  = (int)($_GET['local_id'] ?? ($_SESSION['local_order_id'] ?? 0));
+if ($localOrderId === 0 && is_numeric($uroPayOrderId)) {
+    $localOrderId = (int)$uroPayOrderId;
+}
 
 // Fetch order from DB by ref ID or local ID
 $orderRow = null;
 if (!empty($uroPayOrderId) || $localOrderId > 0) {
-    $sql = "SELECT id, total_amount, payment_id, merchant_order_id, status, food_status, qr_code
+    $sql = "SELECT id, total_amount, payment_id, merchant_order_id, upi_id, status, food_status, qr_code
             FROM orders WHERE ";
     if (!empty($uroPayOrderId) && $localOrderId > 0) {
         $sql .= "(payment_id = ? OR merchant_order_id = ? OR id = ?) ORDER BY id DESC LIMIT 1";
@@ -38,7 +41,13 @@ if (!empty($uroPayOrderId) || $localOrderId > 0) {
 if ($orderRow) {
     $localOrderId  = (int)$orderRow['id'];
     $displayAmount = (float)$orderRow['total_amount'];
-    if (!empty($orderRow['payment_id'])) $uroPayOrderId = $orderRow['payment_id'];
+    if (!empty($orderRow['payment_id'])) {
+        $uroPayOrderId = $orderRow['payment_id'];
+    } elseif (!empty($orderRow['merchant_order_id'])) {
+        $uroPayOrderId = $orderRow['merchant_order_id'];
+    } elseif (empty($uroPayOrderId)) {
+        $uroPayOrderId = "CANTEEN" . $localOrderId;
+    }
 
     // If order is ALREADY completed in DB (by webhook, UTR, or admin), auto-redirect to success screen
     $dbStatus = strtoupper(trim((string)$orderRow['status']));
@@ -116,14 +125,24 @@ $expiresAt        = (int)$_SESSION['payment_expires_at'];
 $remainingSeconds = max(0, $expiresAt - time());
 
 // Resolve UPI ID / VPA
-$upiId = $_SESSION['uropay_upi_id'] ?? '';
+$upiId = !empty($orderRow['upi_id']) ? $orderRow['upi_id'] : ($_SESSION['uropay_upi_id'] ?? '');
 if (empty($upiId) && !empty($orderRow['qr_code'])) {
     if (preg_match('/[?&]pa=([^&]+)/i', $orderRow['qr_code'], $m)) {
         $upiId = urldecode($m[1]);
     }
 }
 if (empty($upiId)) {
-    $upiId = defined('CANTEEN_UPI_ID') ? CANTEEN_UPI_ID : 'canteen@upi';
+    $upiId = defined('CANTEEN_UPI_ID') ? CANTEEN_UPI_ID : '9952611859@slc';
+}
+
+// Ensure upi_id column in orders table is recorded
+if ($localOrderId > 0 && (empty($orderRow['upi_id']) || $orderRow['upi_id'] !== $upiId)) {
+    $updUpi = mysqli_prepare($conn, "UPDATE orders SET upi_id=? WHERE id=?");
+    if ($updUpi) {
+        mysqli_stmt_bind_param($updUpi, "si", $upiId, $localOrderId);
+        mysqli_stmt_execute($updUpi);
+        mysqli_stmt_close($updUpi);
+    }
 }
 
 // Generate standard NPCI UPI Intent Deep Link for Mobile Devices
@@ -135,6 +154,11 @@ $upiDeepLink = !empty($upiString) ? $upiString : ("upi://pay?pa=" . urlencode($u
                "&tr=" . urlencode($uroPayOrderId) . 
                "&tn=" . urlencode("Order #" . $localOrderId . " Canteen") . 
                "&cu=INR");
+
+// Dynamic QR fallback if not provided by gateway
+if (empty($qrCode)) {
+    $qrCode = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" . urlencode($upiDeepLink);
+}
 
 ?>
 
