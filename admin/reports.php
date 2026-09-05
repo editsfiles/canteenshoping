@@ -150,8 +150,14 @@ $activePage = 'reports';
             <h1 class="admin-page-title"><i class="fa-solid fa-chart-line"></i> Financial & Sales Reports</h1>
             <p class="admin-subtitle">Comprehensive sales performance, daily totals, and order audit trail</p>
         </div>
-        <div style="display:flex; gap:10px; align-items:center;">
-            <button class="btn-material btn-success print-btn" onclick="window.print();">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <a href="export_registrations_excel.php?format=csv" class="btn-material btn-success" style="text-decoration:none; background:#16a34a; display:inline-flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-file-excel"></i> Export Registrations (Excel)
+            </a>
+            <a href="customers.php" class="btn-material btn-primary" style="text-decoration:none; background:#0284c7; display:inline-flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-arrows-rotate"></i> Excel Live Sync
+            </a>
+            <button class="btn-material btn-success print-btn" onclick="window.print();" style="background:#475569;">
                 <i class="fa-solid fa-print"></i> Print Report
             </button>
         </div>
