@@ -126,6 +126,15 @@ if (empty($upiId)) {
     $upiId = defined('CANTEEN_UPI_ID') ? CANTEEN_UPI_ID : 'canteen@upi';
 }
 
+// Generate standard NPCI UPI Intent Deep Link for Mobile Devices
+$canteenMerchantName = "College Canteen";
+$formattedAmount = number_format((float)$displayAmount, 2, '.', '');
+$upiDeepLink = !empty($upiString) ? $upiString : ("upi://pay?pa=" . urlencode($upiId) . 
+               "&pn=" . urlencode($canteenMerchantName) . 
+               "&am=" . $formattedAmount . 
+               "&tr=" . urlencode($uroPayOrderId) . 
+               "&tn=" . urlencode("Order #" . $localOrderId . " Canteen") . 
+               "&cu=INR");
 
 ?>
 
@@ -436,6 +445,143 @@ body {
     color: #ef4444;
 }
 
+/* =========================================================
+   DESKTOP VS MOBILE PAYMENT FLOWS
+   ========================================================= */
+
+.desktop-pay-flow {
+    display: block;
+}
+
+.mobile-pay-flow {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-pay-flow {
+        display: none !important;
+    }
+
+    .mobile-pay-flow {
+        display: block !important;
+    }
+}
+
+/* 1-Tap Mobile UPI Button */
+.btn-mobile-pay-now {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 15px 18px;
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.35);
+    margin: 12px 0 14px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.btn-mobile-pay-now:active {
+    transform: scale(0.98);
+}
+
+.upi-apps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.app-tile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #1e293b;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.app-tile:active {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    transform: scale(0.98);
+}
+
+.app-tile.gpay {
+    border-color: #bfdbfe;
+    background: #f0f9ff;
+    color: #0369a1;
+}
+
+.app-tile.phonepe {
+    border-color: #ddd6fe;
+    background: #faf5ff;
+    color: #6b21a8;
+}
+
+.app-tile.paytm {
+    border-color: #bae6fd;
+    background: #f0fdfa;
+    color: #0e7490;
+}
+
+.app-tile.bhim {
+    border-color: #fed7aa;
+    background: #fffbeb;
+    color: #c2410c;
+}
+
+.btn-toggle-qr {
+    background: none;
+    border: 1px dashed #94a3b8;
+    color: #64748b;
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+}
+
+.btn-toggle-qr:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.mobile-auto-alert {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+}
+
 /* UPI ID CARD */
 .upi-id-card {
     background: #f8fafc;
@@ -598,42 +744,118 @@ body {
         </div>
     </div>
 
-    <!-- QR CODE CONTAINER -->
-    <div class="qr-wrapper">
-        <?php if (!empty($qrCode)) { ?>
-            <img id="qrImg" src="<?php echo htmlspecialchars($qrCode); ?>" class="qr-img" alt="UPI QR Code">
-        <?php } else { ?>
-            <div style="width:230px;height:230px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px;padding:20px;">
-                Loading QR Code...
-            </div>
-        <?php } ?>
-    </div>
-
-    <div class="amount">
-        ₹<?php echo number_format((float)$displayAmount, 2); ?>
-    </div>
-
-    <!-- UPI ID BOX WITH ONE-CLICK COPY -->
-    <div class="upi-id-card">
-        <div class="upi-id-header">
-            <span><i class="fa-solid fa-at"></i> Pay to UPI ID</span>
-            <span class="upi-badge"><i class="fa-solid fa-circle-check"></i> Merchant VPA</span>
+    <!-- DESKTOP PAYMENT FLOW (> 768px): DISPLAY SCANNER QR CODE -->
+    <div class="desktop-pay-flow">
+        <div class="qr-wrapper">
+            <?php if (!empty($qrCode)) { ?>
+                <img id="qrImg" src="<?php echo htmlspecialchars($qrCode); ?>" class="qr-img" alt="UPI QR Code">
+            <?php } else { ?>
+                <div style="width:230px;height:230px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px;padding:20px;">
+                    Loading QR Code...
+                </div>
+            <?php } ?>
         </div>
-        <div class="upi-id-box">
-            <span id="upiIdDisplay" class="upi-id-text"><?php echo htmlspecialchars($upiId); ?></span>
-            <button type="button" class="btn-copy" onclick="copyUpiId()" title="Copy UPI ID">
-                <i class="fa-regular fa-copy"></i> <span id="copyBtnLabel">Copy</span>
-            </button>
+
+        <div class="amount">
+            ₹<?php echo number_format((float)$displayAmount, 2); ?>
+        </div>
+
+        <!-- UPI ID BOX WITH ONE-CLICK COPY -->
+        <div class="upi-id-card">
+            <div class="upi-id-header">
+                <span><i class="fa-solid fa-at"></i> Pay to UPI ID</span>
+                <span class="upi-badge"><i class="fa-solid fa-circle-check"></i> Merchant VPA</span>
+            </div>
+            <div class="upi-id-box">
+                <span id="upiIdDisplay" class="upi-id-text"><?php echo htmlspecialchars($upiId); ?></span>
+                <button type="button" class="btn-copy" onclick="copyUpiId()" title="Copy UPI ID">
+                    <i class="fa-regular fa-copy"></i> <span id="copyBtnLabel">Copy</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="instruction-box">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <span>Scan this QR code with Google Pay, PhonePe, Paytm or BHIM on your phone.</span>
+        </div>
+    </div>
+
+    <!-- MOBILE PAYMENT FLOW (<= 768px): 1-TAP NATIVE UPI APP PAYMENT -->
+    <div class="mobile-pay-flow">
+        <div class="amount" style="margin: 6px 0 10px;">
+            ₹<?php echo number_format((float)$displayAmount, 2); ?>
+        </div>
+
+        <div class="mobile-auto-alert" id="mobileAutoPrompt">
+            <i class="fa-solid fa-bolt" style="color:#16a34a; font-size:16px;"></i>
+            <div>
+                <strong>Tap below to pay with your UPI app:</strong>
+                <div style="font-size:11px; color:#15803d; font-weight:normal; margin-top:2px;">Opens Google Pay, PhonePe, or Paytm automatically.</div>
+            </div>
+        </div>
+
+        <!-- PRIMARY 1-TAP OPEN UPI APP BUTTON -->
+        <a href="<?php echo htmlspecialchars($upiDeepLink); ?>" class="btn-mobile-pay-now" id="btnMobilePayNow">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <i class="fa-solid fa-bolt" style="font-size:20px;"></i>
+                <div style="text-align:left;">
+                    <div style="font-size:15px; font-weight:800; line-height:1.2;">Pay ₹<?php echo number_format((float)$displayAmount, 2); ?> via UPI App</div>
+                    <div style="font-size:11px; opacity:0.9; font-weight:500;">Google Pay &bull; PhonePe &bull; Paytm &bull; BHIM</div>
+                </div>
+            </div>
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+
+        <!-- SPECIFIC APP TILES -->
+        <div class="upi-apps-grid">
+            <a href="<?php echo htmlspecialchars($upiDeepLink); ?>" class="app-tile gpay" title="Pay with Google Pay">
+                <i class="fa-brands fa-google" style="color:#4285f4; font-size:16px;"></i>
+                <span>Google Pay</span>
+            </a>
+            <a href="<?php echo htmlspecialchars($upiDeepLink); ?>" class="app-tile phonepe" title="Pay with PhonePe">
+                <i class="fa-solid fa-mobile-screen" style="color:#6739b7; font-size:16px;"></i>
+                <span>PhonePe</span>
+            </a>
+            <a href="<?php echo htmlspecialchars($upiDeepLink); ?>" class="app-tile paytm" title="Pay with Paytm">
+                <i class="fa-solid fa-wallet" style="color:#00b9f5; font-size:16px;"></i>
+                <span>Paytm</span>
+            </a>
+            <a href="<?php echo htmlspecialchars($upiDeepLink); ?>" class="app-tile bhim" title="Pay with BHIM or Other UPI">
+                <i class="fa-solid fa-building-columns" style="color:#ea580c; font-size:16px;"></i>
+                <span>Other UPI</span>
+            </a>
+        </div>
+
+        <!-- OPTIONAL QR ACCORDION ON MOBILE -->
+        <button type="button" class="btn-toggle-qr" onclick="toggleMobileQr()">
+            <i class="fa-solid fa-qrcode"></i> <span id="toggleQrLabel">Scan from another phone? Show QR</span>
+        </button>
+        <div id="mobileQrWrap" style="display:none; margin-bottom:12px;">
+            <div class="qr-wrapper" style="margin:0 auto 8px;">
+                <?php if (!empty($qrCode)) { ?>
+                    <img src="<?php echo htmlspecialchars($qrCode); ?>" class="qr-img" alt="UPI QR Code">
+                <?php } ?>
+            </div>
+            <p style="font-size:11px; color:#64748b;">Have a friend scan this QR with their UPI app</p>
+        </div>
+
+        <!-- MOBILE UPI ID CARD -->
+        <div class="upi-id-card">
+            <div class="upi-id-header">
+                <span><i class="fa-solid fa-at"></i> Pay to UPI ID</span>
+                <span class="upi-badge"><i class="fa-solid fa-circle-check"></i> Merchant</span>
+            </div>
+            <div class="upi-id-box">
+                <span class="upi-id-text"><?php echo htmlspecialchars($upiId); ?></span>
+                <button type="button" class="btn-copy" onclick="copyUpiId()" title="Copy UPI ID">
+                    <i class="fa-regular fa-copy"></i> Copy
+                </button>
+            </div>
         </div>
     </div>
 
     <div class="order-info">
         Order: <strong>#<?php echo htmlspecialchars((string)$localOrderId); ?></strong> &bull; Ref: <strong><?php echo htmlspecialchars($uroPayOrderId); ?></strong>
-    </div>
-
-    <div class="instruction-box">
-        <i class="fa-solid fa-mobile-screen-button"></i>
-        <span>Scan QR with GPay, PhonePe, Paytm or pay directly to the UPI ID above.</span>
     </div>
 
     <div id="statusBox" class="status-box">
@@ -810,6 +1032,35 @@ let remainingSeconds = <?php echo (int)$remainingSeconds; ?>;
 let checking = false;
 let paymentTimer = null;
 let countdownTimer = null;
+
+// Toggle mobile QR code view
+function toggleMobileQr() {
+    const wrap = document.getElementById('mobileQrWrap');
+    const lbl = document.getElementById('toggleQrLabel');
+    if (!wrap) return;
+    if (wrap.style.display === 'none' || wrap.style.display === '') {
+        wrap.style.display = 'block';
+        if (lbl) lbl.textContent = "Hide QR Code";
+    } else {
+        wrap.style.display = 'none';
+        if (lbl) lbl.textContent = "Scan from another phone? Show QR";
+    }
+}
+
+// Auto-trigger UPI payment on mobile devices
+(function() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    if (isMobile) {
+        // Automatically attempt to invoke the UPI deep link after 1.5s
+        setTimeout(function() {
+            const btn = document.getElementById("btnMobilePayNow");
+            if (btn && btn.href) {
+                // If in Android app or mobile browser, auto-navigate to upi intent
+                window.location.href = btn.href;
+            }
+        }, 1500);
+    }
+})();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // COUNTDOWN TIMER LOGIC
