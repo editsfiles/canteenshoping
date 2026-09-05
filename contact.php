@@ -817,6 +817,8 @@ nav a:hover {
 
         <a href="my_orders.php">My Orders</a>
 
+        <a href="profile.php">Profile</a>
+
         <a href="contact.php">Contact</a>
 
         <a href="logout.php">Logout</a>

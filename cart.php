@@ -495,6 +495,7 @@ body {
         <a href="menu.php"><i class="fa-solid fa-utensils"></i> Menu</a>
         <a href="cart.php" class="active"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
         <a href="my_orders.php"><i class="fa-solid fa-receipt"></i> Orders</a>
+        <a href="profile.php"><i class="fa-solid fa-user"></i> Profile</a>
         <a href="contact.php"><i class="fa-solid fa-envelope"></i> Contact</a>
         <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
     </nav>
