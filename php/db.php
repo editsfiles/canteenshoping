@@ -49,61 +49,61 @@ if (!$conn) {
     }
 }
 
-// Render's Docker image runs MariaDB locally when no external DB is configured.
-// MariaDB's default root account may authenticate through its Unix socket, so try
-// the socket explicitly before trying other local credentials.
+// If initial connection failed and target host is local/container,
+// try sockets, TCP 127.0.0.1, and localhost with candidate credentials
 if (!$conn && ($host === 'localhost' || $host === '127.0.0.1' || empty($host))) {
     $possibleSockets = [
         '/run/mysqld/mysqld.sock',
         '/var/run/mysqld/mysqld.sock',
         '/tmp/mysql.sock'
     ];
-
+    $foundSocket = null;
     foreach ($possibleSockets as $socket) {
-        if (!file_exists($socket)) {
-            continue;
-        }
-
-        $conn = @mysqli_connect('localhost', $user, $pass, $name, $port, $socket);
-        if ($conn) {
+        if (file_exists($socket)) {
+            $foundSocket = $socket;
             break;
-        }
-
-        // MariaDB's socket-authenticated root commonly uses an empty password.
-        if ($user === 'root') {
-            $conn = @mysqli_connect('localhost', 'root', '', $name, $port, $socket);
-            if ($conn) {
-                break;
-            }
         }
     }
-}
 
-// Last-resort compatibility attempts for older local/container databases.
-if (!$conn && ($host === 'localhost' || $host === '127.0.0.1' || empty($host))) {
     $credList = [
         [$user, $pass],
-        [$user, 'canteen_pass'],
-        [$user, ''],
-        ['canteen_user', 'canteen_pass'],
-        ['canteen_user', ''],
-        ['canteen_user', $pass],
         ['root', ''],
         ['root', 'root'],
-        ['root', $pass],
+        ['canteen_user', 'canteen_pass'],
+        ['canteen_user', ''],
+        [$user, 'canteen_pass'],
+        [$user, ''],
     ];
 
-    foreach ($credList as $cr) {
-        $conn = @mysqli_connect('127.0.0.1', $cr[0], $cr[1], $name, $port);
-        if ($conn) {
-            break;
+    $targets = [];
+    if ($foundSocket) {
+        $targets[] = ['localhost', $foundSocket];
+    }
+    $targets[] = ['127.0.0.1', null];
+    $targets[] = ['localhost', null];
+
+    foreach ($targets as $t) {
+        $h = $t[0];
+        $s = $t[1];
+        foreach ($credList as $cr) {
+            $u = $cr[0];
+            $p = $cr[1];
+            if ($s) {
+                $conn = @mysqli_connect($h, $u, $p, $name, $port, $s);
+            } else {
+                $conn = @mysqli_connect($h, $u, $p, $name, $port);
+            }
+            if ($conn) {
+                break 2;
+            }
         }
     }
 }
 
 if (!$conn) {
     http_response_code(500);
-    die('Database Connection Error: ' . htmlspecialchars($error));
+    $finalError = mysqli_connect_error() ?: $error ?: 'Database connection failed';
+    die('Database Connection Error: ' . htmlspecialchars($finalError));
 }
 
 mysqli_set_charset($conn, 'utf8mb4');

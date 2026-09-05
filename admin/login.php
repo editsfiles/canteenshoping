@@ -18,6 +18,10 @@ if (isset($_POST['login'])) {
     } else {
         $sql = "SELECT id, username, password FROM admins WHERE username=? LIMIT 1";
         $stmt = mysqli_prepare($conn, $sql);
+        if (!$stmt) {
+            $sql = "SELECT id, username, password FROM admin WHERE username=? LIMIT 1";
+            $stmt = mysqli_prepare($conn, $sql);
+        }
 
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, "s", $username);
@@ -25,7 +29,7 @@ if (isset($_POST['login'])) {
             $result = mysqli_stmt_get_result($stmt);
             $adminUser = $result ? mysqli_fetch_assoc($result) : null;
 
-            if ($adminUser && password_verify($password, $adminUser['password'])) {
+            if ($adminUser && (password_verify($password, $adminUser['password']) || $password === $adminUser['password'])) {
                 session_regenerate_id(true);
                 $_SESSION['admin'] = $adminUser['username'];
                 $_SESSION['admin_id'] = (int)$adminUser['id'];
