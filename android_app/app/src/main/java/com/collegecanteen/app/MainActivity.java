@@ -7,7 +7,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -67,11 +69,31 @@ public class MainActivity extends AppCompatActivity {
             webView.reload();
         });
 
-        // Load Main Canteen Website
+        // Load Main Canteen Website or intent URL
         if (savedInstanceState == null) {
-            webView.loadUrl(APP_URL);
+            if (getIntent() != null && getIntent().getData() != null) {
+                handleIntent(getIntent());
+            } else {
+                webView.loadUrl(APP_URL);
+            }
         } else {
             webView.restoreState(savedInstanceState);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent != null && intent.getData() != null) {
+            String url = intent.getData().toString();
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                webView.loadUrl(url);
+            }
         }
     }
 
@@ -143,6 +165,11 @@ public class MainActivity extends AppCompatActivity {
         cookieManager.setAcceptCookie(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             cookieManager.setAcceptThirdPartyCookies(webView, true);
+        }
+
+        // Enable Chrome DevTools remote debugging for automated inspection
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
         }
 
         webView.setWebViewClient(new CanteenWebViewClient());
@@ -259,6 +286,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Cannot open file chooser.", Toast.LENGTH_SHORT).show();
                 return false;
             }
+            return true;
+        }
+
+        @Override
+        public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+            Log.d("CanteenWeb", "[" + consoleMessage.messageLevel() + "] " 
+                    + consoleMessage.message() + " (" + consoleMessage.sourceId() + ":" + consoleMessage.lineNumber() + ")");
             return true;
         }
     }
