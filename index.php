@@ -137,13 +137,7 @@ Food Categories
 </center>
 </footer>
 
-<script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW notice:', err));
-    });
-}
-</script>
+<?php include_once("php/install_pwa_banner.php"); ?>
 
 </body>
 

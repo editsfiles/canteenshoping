@@ -282,6 +282,28 @@ body {
     text-align: center;
     position: relative;
 }
+.modal-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+.modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.08);
+}
 .modal-header .brand {
     font-size: 13px;
     font-weight: 600;
@@ -563,6 +585,9 @@ body {
 
         <!-- Header with amount -->
         <div class="modal-header">
+            <button type="button" class="modal-close-btn" onclick="closeModal()" aria-label="Close modal" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
             <div class="brand">🍴 College Canteen</div>
             <div class="amount-display">
                 <sup>₹</sup><?php echo number_format($total, 2); ?>
@@ -816,10 +841,21 @@ function setModalText(title, sub) {
 }
 
 function closeModal() {
-    document.getElementById("paymentModal").classList.remove("active");
+    const modal = document.getElementById("paymentModal");
+    if (modal) {
+        modal.classList.remove("active");
+        modal.style.display = "none";
+    }
     document.body.style.overflow = "";
-    clearInterval(paymentInterval);
-    clearTimeout(safetyTimeout);
+    if (paymentInterval) clearInterval(paymentInterval);
+    if (safetyTimeout)   clearTimeout(safetyTimeout);
+
+    const btn = document.getElementById("payNowBtn");
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-lock lock-icon"></i> Pay ₹<?php echo number_format($total, 2); ?> Securely <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:13px;opacity:0.7;"></i>';
+    }
+    isSubmitting = false;
 }
 
 // Close on backdrop click (only if not yet verified)

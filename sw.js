@@ -2,26 +2,23 @@
    COLLEGE CANTEEN SERVICE WORKER (PWA)
    ========================================================= */
 
-const CACHE_NAME = 'canteen-cache-v1';
-const ASSETS_TO_PRECACHE = [
-  './',
-  './index.php',
-  './menu.php',
-  './css/style.css',
+const CACHE_NAME = 'canteen-cache-v2';
+const STATIC_ASSETS = [
   './manifest.json',
+  './css/style.css',
   './uploads/Burger.jpg'
 ];
 
-// Install Event: Pre-cache static assets
+// Install Event: Pre-cache core styling and icons
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_PRECACHE);
+      return cache.addAll(STATIC_ASSETS);
     }).then(() => self.skipWaiting())
   );
 });
 
-// Activate Event: Clear older caches
+// Activate Event: Clear outdated caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -36,29 +33,58 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event: Network-first with cache fallback
+// Fetch Event: Network-first for pages/API, Cache-first for static assets
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // Cache successful requests for CSS / JS / images
-        if (networkResponse && networkResponse.status === 200) {
-          const url = event.request.url;
-          if (url.endsWith('.css') || url.endsWith('.js') || url.endsWith('.jpg') || url.endsWith('.png')) {
-            const responseClone = networkResponse.clone();
+  const url = new URL(event.request.url);
+
+  // Never cache payment, authentication, or live status checking endpoints
+  if (
+    url.pathname.includes('check_uropay_status') ||
+    url.pathname.includes('uropay_payment') ||
+    url.pathname.includes('webhook') ||
+    url.pathname.includes('create_order') ||
+    url.pathname.includes('check_payment')
+  ) {
+    return; // Pass through to network directly
+  }
+
+  // Static assets: Cache falling back to network
+  if (
+    url.pathname.endsWith('.css') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.jpg') ||
+    url.pathname.endsWith('.jpeg') ||
+    url.pathname.endsWith('.png') ||
+    url.pathname.endsWith('.woff2')
+  ) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
+              cache.put(event.request, copy);
             });
           }
-        }
-        return networkResponse;
+          return networkResponse;
+        });
       })
-      .catch(() => {
-        // Offline fallback from cache
-        return caches.match(event.request);
-      })
+    );
+    return;
+  }
+
+  // Dynamic pages: Network-first with offline fallback
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      return caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return caches.match('./index.php');
+      });
+    })
   );
 });

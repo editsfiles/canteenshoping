@@ -11,6 +11,14 @@
 *.log
 webhook_log.txt
 *cookie*.txt
+phone_*.png
+
+# Android build outputs & caches
+android_app/.gradle/
+android_app/build/
+android_app/app/build/
+android_app/local.properties
+.gradle/
 
 # OS generated files
 .DS_Store

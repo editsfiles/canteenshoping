@@ -130,6 +130,7 @@ if ($localOrderId > 0 && isset($conn)) {
             pointer-events: auto;
         }
         .modal-card {
+            position: relative;
             background: #ffffff;
             padding: 35px 30px;
             border-radius: 20px;
@@ -138,6 +139,27 @@ if ($localOrderId > 0 && isset($conn)) {
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-card-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            background: #f1f5f9;
+            border-radius: 50%;
+            border: none;
+            color: #64748b;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .modal-card-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
         }
         @keyframes popIn {
             from { transform: scale(0.85); opacity: 0; }
@@ -201,6 +223,9 @@ if ($localOrderId > 0 && isset($conn)) {
 <!-- Real-time Verification Overlay Frame -->
 <div id="paymentModal" class="payment-overlay">
     <div class="modal-card">
+        <button type="button" class="modal-card-close" onclick="closePaymentModal()" aria-label="Close" title="Close">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
         <div id="modalVisual" class="spinner"></div>
         <div id="statusMessage" class="status-txt">Securing your payment details...</div>
         <div class="sub-txt">Please do not close this window or click back.</div>
@@ -278,6 +303,12 @@ function openPaymentGateway(orderId) {
         clearInterval(verificationLoop);
         document.getElementById("statusMessage").innerText = "Payment window expired.";
     }, 240000);
+}
+
+function closePaymentModal() {
+    document.getElementById("paymentModal").classList.remove("active");
+    if (verificationLoop) clearInterval(verificationLoop);
+    if (securityTimeout) clearTimeout(securityTimeout);
 }
 </script>
 

@@ -39,6 +39,14 @@ if ($orderRow) {
     $localOrderId  = (int)$orderRow['id'];
     $displayAmount = (float)$orderRow['total_amount'];
     if (!empty($orderRow['payment_id'])) $uroPayOrderId = $orderRow['payment_id'];
+
+    // If order is ALREADY completed in DB (by webhook, UTR, or admin), auto-redirect to success screen
+    $dbStatus = strtoupper(trim((string)$orderRow['status']));
+    if (in_array($dbStatus, ['COMPLETED', 'PAID', 'SUCCESS'], true)) {
+        header("Location: payment_success.php?order_id=" . $localOrderId . "&uropay_id=" . urlencode($uroPayOrderId));
+        exit();
+    }
+
     // Restore QR from database if not in session
     if (empty($_SESSION['uropay_qr']) && !empty($orderRow['qr_code'])) {
         $_SESSION['uropay_qr'] = $orderRow['qr_code'];
@@ -147,15 +155,65 @@ body {
 }
 
 .box {
+    position: relative;
     width: 450px;
     max-width: 100%;
     background: white;
-    padding: 30px 25px;
+    padding: 32px 25px 26px;
     border-radius: 20px;
     text-align: center;
     box-shadow: 0 15px 35px rgba(0,0,0,0.12);
     animation: fadeIn 0.4s ease;
     border: 1px solid rgba(0,0,0,0.06);
+}
+
+.card-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    z-index: 10;
+}
+.card-close-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+    transform: scale(1.08);
+}
+
+.btn-close-safe {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    color: #334155;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+.btn-close-safe:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
 }
 
 @keyframes fadeIn {
@@ -513,6 +571,11 @@ body {
 
 <div class="box">
 
+    <!-- TOP CLOSE BUTTON (Safe Exit to Orders) -->
+    <a href="my_orders.php" class="card-close-btn" title="Close and return to My Orders" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+    </a>
+
     <div class="header-title">
         <i class="fa-solid fa-qrcode" style="color:#2563eb;"></i>
         <span>Scan & Pay with UPI</span>
@@ -605,6 +668,11 @@ body {
         </div>
         <div id="utrMessage" class="utr-msg" style="display:none;"></div>
     </div>
+
+    <!-- SAFE EXIT LINK -->
+    <a href="my_orders.php" class="btn-close-safe">
+        <i class="fa-solid fa-arrow-left"></i> Already Paid? Close & Go to My Orders
+    </a>
 
     <div class="actions-row">
         <a href="my_orders.php">
@@ -1085,6 +1153,21 @@ if (utrInput) {
         }
     });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUTO-TRIGGER STATUS CHECK WHEN STUDENT SWITCHES BACK FROM GPAY / UPI APP
+// ─────────────────────────────────────────────────────────────────────────────
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === "visible") {
+        console.log("Tab resumed from UPI app — verifying payment immediately...");
+        checkPayment(false);
+    }
+});
+
+window.addEventListener("focus", function() {
+    console.log("Window focused — verifying payment immediately...");
+    checkPayment(false);
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AUTO-START on page load — the QR is already showing, begin tracking now

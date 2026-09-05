@@ -368,5 +368,6 @@ password.type="password";
 
 </script>
 
+<?php include_once("php/install_pwa_banner.php"); ?>
 </body>
 </html>

@@ -104,12 +104,8 @@ function changeQty(id,val){
  if(q<1) q=1;
  e.value=q;
 }
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW notice:', err));
-    });
-}
 </script>
+
+<?php include_once("php/install_pwa_banner.php"); ?>
 </body>
 </html>
