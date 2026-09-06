@@ -1,0 +1,11 @@
+WEB
+1
+http://localhost/Canteenshoping/admin/export_users_live.php?key=canteen_live_sync_2026
+
+Selection=registered_users_table
+Formatting=All
+PreFormattedTextToColumns=True
+ConsecutiveDelimitersAsOne=True
+SingleBlockTextImport=False
+DisableDateRecognition=False
+DisableRedirections=False

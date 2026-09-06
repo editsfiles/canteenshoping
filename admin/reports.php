@@ -151,11 +151,11 @@ $activePage = 'reports';
             <p class="admin-subtitle">Comprehensive sales performance, daily totals, and order audit trail</p>
         </div>
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <a href="export_registrations_excel.php?format=csv" class="btn-material btn-success" style="text-decoration:none; background:#16a34a; display:inline-flex; align-items:center; gap:6px;">
-                <i class="fa-solid fa-file-excel"></i> Export Registrations (Excel)
+            <a href="export_users_live.php?format=iqy" class="btn-material btn-success" style="text-decoration:none; background:#16a34a; display:inline-flex; align-items:center; gap:6px;" title="Connect registered users to Excel with Live Update">
+                <i class="fa-solid fa-file-excel"></i> Live Excel Sync (.iqy)
             </a>
-            <a href="customers.php" class="btn-material btn-primary" style="text-decoration:none; background:#0284c7; display:inline-flex; align-items:center; gap:6px;">
-                <i class="fa-solid fa-arrows-rotate"></i> Excel Live Sync
+            <a href="export_users_live.php?format=csv" class="btn-material" style="text-decoration:none; background:#0284c7; color:#fff; display:inline-flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
             </a>
             <button class="btn-material btn-success print-btn" onclick="window.print();" style="background:#475569;">
                 <i class="fa-solid fa-print"></i> Print Report
