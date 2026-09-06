@@ -10,37 +10,38 @@ if(isset($_POST['register'])){
     $regno = trim($_POST['regno']);
     $department = trim($_POST['department']);
     $email = trim($_POST['email']);
+    $phone = trim($_POST['phone'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if($name=="" || $regno=="" || $department=="" || $email=="" || $password==""){
+    if($name=="" || $regno=="" || $department=="" || $email=="" || $phone=="" || $password==""){
 
-        $message = "<p style='color:red;'>All fields are required.</p>";
+        $message = "<p style='color:red;'>All fields including Mobile Number are required.</p>";
 
     }else{
 
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-        $checkStmt = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ? OR regno = ? LIMIT 1");
+        $checkStmt = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ? OR regno = ? OR phone = ? LIMIT 1");
 
         if (!$checkStmt) {
             $message = "<p style='color:red;'>Registration Failed.</p>";
         } else {
-            mysqli_stmt_bind_param($checkStmt, "ss", $email, $regno);
+            mysqli_stmt_bind_param($checkStmt, "sss", $email, $regno, $phone);
             mysqli_stmt_execute($checkStmt);
             $checkResult = mysqli_stmt_get_result($checkStmt);
 
             if(mysqli_num_rows($checkResult) > 0){
 
-                $message = "<p style='color:red;'>Email or Register Number already exists.</p>";
+                $message = "<p style='color:red;'>Email, Register Number, or Mobile Number already exists.</p>";
 
             } else {
 
-                $insertStmt = mysqli_prepare($conn, "INSERT INTO users(name, regno, department, email, password) VALUES (?, ?, ?, ?, ?)");
+                $insertStmt = mysqli_prepare($conn, "INSERT INTO users(name, regno, department, email, phone, password) VALUES (?, ?, ?, ?, ?, ?)");
 
                 if (!$insertStmt) {
                     $message = "<p style='color:red;'>Registration Failed.</p>";
                 } else {
-                    mysqli_stmt_bind_param($insertStmt, "sssss", $name, $regno, $department, $email, $passwordHash);
+                    mysqli_stmt_bind_param($insertStmt, "ssssss", $name, $regno, $department, $email, $phone, $passwordHash);
 
                     if(mysqli_stmt_execute($insertStmt)){
 
@@ -214,12 +215,17 @@ font-size:21px;
 </div>
 <div class="form-group">
 <label>Email</label>
-<input type="email" name="email" required>
+<input type="email" name="email" placeholder="student@example.com" required>
+</div>
+
+<div class="form-group">
+<label>Mobile Number</label>
+<input type="tel" name="phone" placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required>
 </div>
 
 <div class="form-group">
 <label>Password</label>
-<input type="password" name="password" required>
+<input type="password" name="password" placeholder="Create password" required>
 </div>
 
 <button type="submit" name="register">Register</button>

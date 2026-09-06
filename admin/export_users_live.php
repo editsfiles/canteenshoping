@@ -68,6 +68,7 @@ $sql = "SELECT
             u.regno AS register_number,
             u.department,
             u.email,
+            COALESCE(u.phone, 'N/A') AS mobile_number,
             u.created_at AS registered_at,
             COUNT(o.id) AS total_orders,
             SUM(CASE WHEN o.status = 'Completed' THEN 1 ELSE 0 END) AS completed_orders,
@@ -75,7 +76,7 @@ $sql = "SELECT
             MAX(o.order_date) AS last_order_date
         FROM users u
         LEFT JOIN orders o ON u.id = o.user_id
-        GROUP BY u.id, u.name, u.regno, u.department, u.email, u.created_at
+        GROUP BY u.id, u.name, u.regno, u.department, u.email, u.phone, u.created_at
         ORDER BY u.id DESC";
 
 $result = mysqli_query($conn, $sql);
@@ -103,6 +104,7 @@ if ($format === 'csv') {
         'Register Number',
         'Department',
         'Email Address',
+        'Mobile Number',
         'Registered Date & Time',
         'Total Orders',
         'Completed Orders',
@@ -118,6 +120,7 @@ if ($format === 'csv') {
             $row['register_number'] ?: 'N/A',
             $row['department'] ?: 'General',
             $row['email'],
+            $row['mobile_number'],
             $row['registered_at'],
             (int)$row['total_orders'],
             (int)$row['completed_orders'],
@@ -247,6 +250,7 @@ header("Content-Type: text/html; charset=UTF-8");
                 <th>Register Number</th>
                 <th>Department</th>
                 <th>Email Address</th>
+                <th>Mobile Number</th>
                 <th>Registration Date</th>
                 <th class="num">Total Orders</th>
                 <th class="num">Completed Orders</th>
@@ -264,6 +268,7 @@ header("Content-Type: text/html; charset=UTF-8");
                         <td><?php echo htmlspecialchars($row['register_number'] ?: 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($row['department'] ?: 'General'); ?></td>
                         <td><?php echo htmlspecialchars($row['email']); ?></td>
+                        <td><strong style="color: #0369a1; font-family: monospace;"><?php echo htmlspecialchars($row['mobile_number']); ?></strong></td>
                         <td><?php echo htmlspecialchars(date('d-m-Y H:i', strtotime($row['registered_at']))); ?></td>
                         <td class="num"><?php echo (int)$row['total_orders']; ?></td>
                         <td class="num"><?php echo (int)$row['completed_orders']; ?></td>
@@ -274,7 +279,7 @@ header("Content-Type: text/html; charset=UTF-8");
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="11" style="text-align: center; padding: 20px; color: #94a3b8;">No registered students found in database.</td>
+                    <td colspan="12" style="text-align: center; padding: 20px; color: #94a3b8;">No registered students found in database.</td>
                 </tr>
             <?php endif; ?>
         </tbody>

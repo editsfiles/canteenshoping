@@ -20,14 +20,14 @@ if(isset($_POST['login'])){
 
     }else{
 
-        // Get user by email
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
+        // Get user by email, mobile number, or register number
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email=? OR phone=? OR regno=? LIMIT 1");
 
         if(!$stmt){
             die("Prepare failed: " . $conn->error);
         }
 
-        $stmt->bind_param("s",$email);
+        $stmt->bind_param("sss", $email, $email, $email);
         $stmt->execute();
 
         $result = $stmt->get_result();

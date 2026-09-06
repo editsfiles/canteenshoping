@@ -152,6 +152,7 @@ $activePage = 'customers';
                         <th>Register No</th>
                         <th>Department</th>
                         <th>Email Address</th>
+                        <th>Mobile</th>
                         <th style="text-align:right; width:160px;">Actions</th>
                     </tr>
                 </thead>
@@ -165,7 +166,7 @@ $activePage = 'customers';
                             </td>
                             <td>
                                 <span style="font-family:monospace; font-weight:600; background:#f1f5f9; padding:3px 8px; border-radius:6px; color:#334155;">
-                                    <?php echo htmlspecialchars($row['regno'] ?: 'N/A'); ?>
+                                     <?php echo htmlspecialchars($row['regno'] ?: 'N/A'); ?>
                                 </span>
                             </td>
                             <td>
@@ -177,6 +178,15 @@ $activePage = 'customers';
                                 <span style="color:#2563eb; font-size:13px;">
                                     <i class="fa-regular fa-envelope" style="margin-right:4px;"></i><?php echo htmlspecialchars($row['email']); ?>
                                 </span>
+                            </td>
+                            <td>
+                                <?php if (!empty($row['phone'])): ?>
+                                    <a href="tel:<?php echo htmlspecialchars($row['phone']); ?>" style="color:#0f766e; font-weight:600; text-decoration:none; font-size:13px;">
+                                        <i class="fa-solid fa-phone" style="margin-right:4px;"></i><?php echo htmlspecialchars($row['phone']); ?>
+                                    </a>
+                                <?php else: ?>
+                                    <span style="color:#94a3b8; font-size:13px;">N/A</span>
+                                <?php endif; ?>
                             </td>
                             <td style="text-align:right;">
                                 <a href="customer_details.php?id=<?php echo $row['id']; ?>" class="btn-material btn-primary" style="padding:6px 12px; font-size:12px; margin-right:4px;">
@@ -190,7 +200,7 @@ $activePage = 'customers';
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:40px; color:#94a3b8;">
+                            <td colspan="7" style="text-align:center; padding:40px; color:#94a3b8;">
                                 <i class="fa-solid fa-user-slash" style="font-size:36px; margin-bottom:10px; display:block; opacity:0.4;"></i>
                                 No customers found.
                             </td>

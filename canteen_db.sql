@@ -174,6 +174,7 @@ CREATE TABLE `users` (
   `regno` varchar(100) NOT NULL,
   `department` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
