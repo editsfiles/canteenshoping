@@ -61,6 +61,19 @@ header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 
+// Ensure phone column exists or fallback gracefully
+$hasPhone = false;
+$colCheck = @mysqli_query($conn, "SHOW COLUMNS FROM users LIKE 'phone'");
+if ($colCheck && mysqli_num_rows($colCheck) > 0) {
+    $hasPhone = true;
+} else {
+    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN phone VARCHAR(20) DEFAULT NULL AFTER email");
+    $hasPhone = true;
+}
+
+$phoneSelect = $hasPhone ? "COALESCE(u.phone, 'N/A') AS mobile_number," : "'N/A' AS mobile_number,";
+$phoneGroup = $hasPhone ? ", u.phone" : "";
+
 // Query all registered users with live order aggregates
 $sql = "SELECT 
             u.id AS student_id,
@@ -68,7 +81,7 @@ $sql = "SELECT
             u.regno AS register_number,
             u.department,
             u.email,
-            COALESCE(u.phone, 'N/A') AS mobile_number,
+            $phoneSelect
             u.created_at AS registered_at,
             COUNT(o.id) AS total_orders,
             SUM(CASE WHEN o.status = 'Completed' THEN 1 ELSE 0 END) AS completed_orders,
@@ -76,7 +89,7 @@ $sql = "SELECT
             MAX(o.order_date) AS last_order_date
         FROM users u
         LEFT JOIN orders o ON u.id = o.user_id
-        GROUP BY u.id, u.name, u.regno, u.department, u.email, u.phone, u.created_at
+        GROUP BY u.id, u.name, u.regno, u.department, u.email $phoneGroup, u.created_at
         ORDER BY u.id DESC";
 
 $result = mysqli_query($conn, $sql);

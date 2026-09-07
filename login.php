@@ -24,13 +24,21 @@ if(isset($_POST['login'])){
         $stmt = $conn->prepare("SELECT * FROM users WHERE email=? OR phone=? OR regno=? LIMIT 1");
 
         if(!$stmt){
-            die("Prepare failed: " . $conn->error);
+            // Fallback for older database versions without phone column
+            $stmt = $conn->prepare("SELECT * FROM users WHERE email=? OR regno=? LIMIT 1");
+            if ($stmt) {
+                $stmt->bind_param("ss", $email, $email);
+                $stmt->execute();
+            }
+        } else {
+            $stmt->bind_param("sss", $email, $email, $email);
+            $stmt->execute();
         }
 
-        $stmt->bind_param("sss", $email, $email, $email);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
+        if(!$stmt){
+            $message = "<div class='error'>Database error occurred. Please try again.</div>";
+        } else {
+            $result = $stmt->get_result();
 
         if($result->num_rows == 1){
 
@@ -62,9 +70,8 @@ if(isset($_POST['login'])){
         }
 
         $stmt->close();
-
     }
-
+}
 }
 ?>
 <!DOCTYPE html>

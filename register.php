@@ -21,12 +21,21 @@ if(isset($_POST['register'])){
 
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
+        $hasPhone = true;
         $checkStmt = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ? OR regno = ? OR phone = ? LIMIT 1");
+        if (!$checkStmt) {
+            $hasPhone = false;
+            $checkStmt = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ? OR regno = ? LIMIT 1");
+        }
 
         if (!$checkStmt) {
             $message = "<p style='color:red;'>Registration Failed.</p>";
         } else {
-            mysqli_stmt_bind_param($checkStmt, "sss", $email, $regno, $phone);
+            if ($hasPhone) {
+                mysqli_stmt_bind_param($checkStmt, "sss", $email, $regno, $phone);
+            } else {
+                mysqli_stmt_bind_param($checkStmt, "ss", $email, $regno);
+            }
             mysqli_stmt_execute($checkStmt);
             $checkResult = mysqli_stmt_get_result($checkStmt);
 
@@ -36,23 +45,30 @@ if(isset($_POST['register'])){
 
             } else {
 
-                $insertStmt = mysqli_prepare($conn, "INSERT INTO users(name, regno, department, email, phone, password) VALUES (?, ?, ?, ?, ?, ?)");
+                if ($hasPhone) {
+                    $insertStmt = mysqli_prepare($conn, "INSERT INTO users(name, regno, department, email, phone, password) VALUES (?, ?, ?, ?, ?, ?)");
+                    if ($insertStmt) {
+                        mysqli_stmt_bind_param($insertStmt, "ssssss", $name, $regno, $department, $email, $phone, $passwordHash);
+                    }
+                } else {
+                    $insertStmt = false;
+                }
+
+                if (!$insertStmt) {
+                    $insertStmt = mysqli_prepare($conn, "INSERT INTO users(name, regno, department, email, password) VALUES (?, ?, ?, ?, ?)");
+                    if ($insertStmt) {
+                        mysqli_stmt_bind_param($insertStmt, "sssss", $name, $regno, $department, $email, $passwordHash);
+                    }
+                }
 
                 if (!$insertStmt) {
                     $message = "<p style='color:red;'>Registration Failed.</p>";
                 } else {
-                    mysqli_stmt_bind_param($insertStmt, "ssssss", $name, $regno, $department, $email, $phone, $passwordHash);
-
                     if(mysqli_stmt_execute($insertStmt)){
-
                         $message = "<p style='color:green;'>Registration Successful. <a href='login.php'>Login Here</a></p>";
-
                     }else{
-
                         $message = "<p style='color:red;'>Registration Failed.</p>";
-
                     }
-
                     mysqli_stmt_close($insertStmt);
                 }
             }

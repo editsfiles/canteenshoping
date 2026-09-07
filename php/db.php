@@ -108,4 +108,12 @@ if (!$conn) {
 
 mysqli_set_charset($conn, 'utf8mb4');
 @mysqli_query($conn, "SET time_zone = '+05:30'");
+
+// Auto-migrate schema updates if missing on live deployments (e.g. Render)
+if ($conn) {
+    $colCheck = @mysqli_query($conn, "SHOW COLUMNS FROM users LIKE 'phone'");
+    if ($colCheck && mysqli_num_rows($colCheck) === 0) {
+        @mysqli_query($conn, "ALTER TABLE users ADD COLUMN phone VARCHAR(20) DEFAULT NULL AFTER email");
+    }
+}
 ?>

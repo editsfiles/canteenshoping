@@ -32,6 +32,7 @@ if (isset($_GET['search']) && trim($_GET['search']) != "") {
            OR regno LIKE '%$search%'
            OR department LIKE '%$search%'
            OR email LIKE '%$search%'
+           OR phone LIKE '%$search%'
         ORDER BY id DESC
     ");
 } else {
