@@ -39,13 +39,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             
-            <!-- Handle deep links to local canteen server -->
+            <!-- Handle deep links -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="canteen" />
                 <data android:scheme="http" android:host="172.29.247.177" />
-                <data android:scheme="http" android:host="10.0.2.2" />
             </intent-filter>
         </activity>
 

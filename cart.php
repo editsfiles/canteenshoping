@@ -1,12 +1,10 @@
 <?php
-session_start();
+include("php/db.php");
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
-
-include("php/db.php");
 
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = array();

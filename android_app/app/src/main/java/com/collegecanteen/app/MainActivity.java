@@ -36,6 +36,23 @@ public class MainActivity extends AppCompatActivity {
     public static final String EMULATOR_URL  = "http://10.0.2.2/Canteenshoping";
     public static final String APP_URL       = LOCAL_LAN_URL;
 
+    public static boolean isEmulator() {
+        return Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || "google_sdk".equals(Build.PRODUCT)
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu");
+    }
+
+    public static String getAppUrl() {
+        return isEmulator() ? EMULATOR_URL : LOCAL_LAN_URL;
+    }
+
     private WebView webView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar progressBar;
@@ -68,7 +85,11 @@ public class MainActivity extends AppCompatActivity {
         btnRetry.setOnClickListener(v -> {
             layoutOffline.setVisibility(View.GONE);
             swipeRefreshLayout.setVisibility(View.VISIBLE);
-            webView.reload();
+            if (webView.getUrl() != null && !webView.getUrl().isEmpty()) {
+                webView.reload();
+            } else {
+                webView.loadUrl(getAppUrl());
+            }
         });
 
         // Load Main Canteen Website or intent URL
@@ -76,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             if (getIntent() != null && getIntent().getData() != null) {
                 handleIntent(getIntent());
             } else {
-                webView.loadUrl(APP_URL);
+                webView.loadUrl(getAppUrl());
             }
         } else {
             webView.restoreState(savedInstanceState);

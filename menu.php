@@ -1,12 +1,10 @@
 <?php
-session_start();
+include("php/db.php");
 
-if(!isset($_SESSION['user_id'])){
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
-
-include("php/db.php");
 
 $search = "";
 if (isset($_GET['search']) && trim($_GET['search']) != "") {
