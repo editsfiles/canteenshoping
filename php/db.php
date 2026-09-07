@@ -111,9 +111,46 @@ mysqli_set_charset($conn, 'utf8mb4');
 
 // Auto-migrate schema updates if missing on live deployments (e.g. Render)
 if ($conn) {
-    $colCheck = @mysqli_query($conn, "SHOW COLUMNS FROM users LIKE 'phone'");
-    if ($colCheck && mysqli_num_rows($colCheck) === 0) {
-        @mysqli_query($conn, "ALTER TABLE users ADD COLUMN phone VARCHAR(20) DEFAULT NULL AFTER email");
+    // 1. Ensure users columns
+    $uCols = @mysqli_query($conn, "SHOW COLUMNS FROM users");
+    if ($uCols) {
+        $uFields = [];
+        while ($r = mysqli_fetch_assoc($uCols)) {
+            $uFields[] = $r['Field'];
+        }
+        if (!in_array('phone', $uFields)) {
+            @mysqli_query($conn, "ALTER TABLE users ADD COLUMN phone VARCHAR(20) DEFAULT NULL AFTER email");
+        }
+    }
+
+    // 2. Ensure orders columns
+    $oCols = @mysqli_query($conn, "SHOW COLUMNS FROM orders");
+    if ($oCols) {
+        $oFields = [];
+        while ($r = mysqli_fetch_assoc($oCols)) {
+            $oFields[] = $r['Field'];
+        }
+        if (!in_array('upi_id', $oFields)) {
+            @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN upi_id VARCHAR(100) DEFAULT '9952611859@slc' AFTER payment_method");
+        }
+        if (!in_array('bank_utr', $oFields)) {
+            @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN bank_utr VARCHAR(100) DEFAULT NULL AFTER payment_id");
+        }
+        if (!in_array('merchant_order_id', $oFields)) {
+            @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN merchant_order_id VARCHAR(255) DEFAULT NULL AFTER bank_utr");
+        }
+        if (!in_array('food_status', $oFields)) {
+            @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN food_status VARCHAR(50) NOT NULL DEFAULT 'Preparing' AFTER status");
+        }
+        if (!in_array('qr_code', $oFields)) {
+            @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN qr_code MEDIUMTEXT DEFAULT NULL AFTER upi_id");
+        }
+        if (!in_array('refund_status', $oFields)) {
+            @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN refund_status VARCHAR(100) DEFAULT NULL AFTER order_date");
+        }
+        if (!in_array('refund_notes', $oFields)) {
+            @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN refund_notes VARCHAR(255) DEFAULT NULL AFTER refund_status");
+        }
     }
 }
 ?>

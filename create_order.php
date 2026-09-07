@@ -552,24 +552,81 @@ $stmt = mysqli_prepare(
 );
 
 if (!$stmt) {
+    // Auto-migrate orders table schema if missing columns
+    @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN upi_id VARCHAR(100) DEFAULT '9952611859@slc' AFTER payment_method");
+    @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN qr_code MEDIUMTEXT DEFAULT NULL AFTER upi_id");
+    @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN merchant_order_id VARCHAR(255) DEFAULT NULL AFTER payment_id");
+
+    $stmt = mysqli_prepare(
+        $conn,
+        "INSERT INTO orders
+        (
+            user_id,
+            total_amount,
+            payment_id,
+            merchant_order_id,
+            payment_method,
+            upi_id,
+            qr_code,
+            status,
+            order_date
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+    );
+}
+
+if (!$stmt) {
+    // Fallback query without upi_id
+    $stmt = mysqli_prepare(
+        $conn,
+        "INSERT INTO orders
+        (
+            user_id,
+            total_amount,
+            payment_id,
+            merchant_order_id,
+            payment_method,
+            qr_code,
+            status,
+            order_date
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())"
+    );
+
+    if ($stmt) {
+        mysqli_stmt_bind_param(
+            $stmt,
+            "idsssss",
+            $user_id,
+            $grandTotal,
+            $paymentId,
+            $merchantOrderId,
+            $paymentMethod,
+            $qrCode,
+            $status
+        );
+    }
+} else {
+    mysqli_stmt_bind_param(
+        $stmt,
+        "idssssss",
+        $user_id,
+        $grandTotal,
+        $paymentId,
+        $merchantOrderId,
+        $paymentMethod,
+        $upiId,
+        $qrCode,
+        $status
+    );
+}
+
+if (!$stmt) {
     die(
         "Database Prepare Error: " .
         htmlspecialchars(mysqli_error($conn))
     );
 }
-
-mysqli_stmt_bind_param(
-    $stmt,
-    "idssssss",
-    $user_id,
-    $grandTotal,
-    $paymentId,
-    $merchantOrderId,
-    $paymentMethod,
-    $upiId,
-    $qrCode,
-    $status
-);
 
 if (!mysqli_stmt_execute($stmt)) {
     die(

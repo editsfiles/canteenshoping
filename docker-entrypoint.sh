@@ -67,9 +67,16 @@ EOF
             echo "$DB_NAME already contains $TABLES_EXIST tables."
         fi
 
-        # Ensure phone column exists and passwords / phone numbers are synced
+        # Ensure all columns exist and passwords / phone numbers are synced
         mysql "$DB_NAME" -e "
             ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(20) DEFAULT NULL AFTER email;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS upi_id VARCHAR(100) DEFAULT '9952611859@slc' AFTER payment_method;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS bank_utr VARCHAR(100) DEFAULT NULL AFTER payment_id;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS merchant_order_id VARCHAR(255) DEFAULT NULL AFTER bank_utr;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS food_status VARCHAR(50) NOT NULL DEFAULT 'Preparing' AFTER status;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS qr_code MEDIUMTEXT DEFAULT NULL AFTER upi_id;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS refund_status VARCHAR(100) DEFAULT NULL AFTER order_date;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS refund_notes VARCHAR(255) DEFAULT NULL AFTER refund_status;
             UPDATE admins SET password='12345' WHERE username='admin';
             UPDATE admin SET password='12345' WHERE username='admin';
             UPDATE users SET password='12345', phone='9952611859' WHERE email='mohanraj.s4211@gmail.com';
