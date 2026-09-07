@@ -86,8 +86,9 @@ if (!empty($_SESSION['cart'])) {
     }
 }
 
-$gst = round($total * 0.05, 2);
-$grandTotal = round($total + $gst, 2);
+$gst = round($total * 0.06, 2);
+$platformFee = 0.00;
+$grandTotal = round($total + $gst + $platformFee, 2);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -604,8 +605,12 @@ include("php/navbar.php");
                 <span>₹<?php echo number_format($total, 2); ?></span>
             </div>
             <div class="summary-row">
-                <span>GST & Taxes (5%)</span>
+                <span>GST & Taxes (6%)</span>
                 <span>₹<?php echo number_format($gst, 2); ?></span>
+            </div>
+            <div class="summary-row">
+                <span>Platform Fee</span>
+                <span style="color:#16a34a; font-weight:600;">FREE (₹0)</span>
             </div>
             <div class="summary-row total-row">
                 <span>Total Amount</span>

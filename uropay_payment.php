@@ -742,7 +742,7 @@ body {
 <div class="box">
 
     <!-- TOP CLOSE BUTTON (Safe Exit to Orders) -->
-    <a href="my_orders.php" class="card-close-btn" title="Close and return to My Orders" aria-label="Close">
+    <a href="javascript:void(0)" onclick="confirmAndGoToOrders()" class="card-close-btn" title="Close and return to My Orders" aria-label="Close">
         <i class="fa-solid fa-xmark"></i>
     </a>
 
@@ -916,7 +916,7 @@ body {
     </div>
 
     <!-- SAFE EXIT LINK -->
-    <a href="my_orders.php" class="btn-close-safe">
+    <a href="javascript:void(0)" onclick="confirmAndGoToOrders()" class="btn-close-safe">
         <i class="fa-solid fa-arrow-left"></i> Already Paid? Close & Go to My Orders
     </a>
 
@@ -1051,6 +1051,7 @@ body {
 <script>
 const orderId      = <?php echo json_encode($uroPayOrderId); ?>;
 const localOrderId = <?php echo (int)$localOrderId; ?>;
+const displayAmount = <?php echo (float)$displayAmount; ?>;
 const totalDuration = 600; // 10 minutes
 let remainingSeconds = <?php echo (int)$remainingSeconds; ?>;
 let checking = false;
@@ -1091,14 +1092,29 @@ function toggleMobileQr() {
 // ─────────────────────────────────────────────────────────────────────────────
 function updateCountdown() {
     if (remainingSeconds <= 0) {
-        const displayEl = document.getElementById("timerDisplay");
-        if (displayEl) displayEl.innerText = "Time Expired - Still checking bank...";
-        
+        clearInterval(countdownTimer);
         const containerEl = document.getElementById("timerContainer");
-        if (containerEl) containerEl.classList.add("warning");
-
-        // Even when timer hits 0, DO NOT stop checking bank! 
-        // Student might have just paid. Continue polling every 3 seconds!
+        if (containerEl) {
+            containerEl.classList.add("warning");
+            containerEl.innerHTML = `
+                <div style="padding:12px 14px; text-align:center;">
+                    <div style="font-weight:700; color:#b45309; font-size:14px; margin-bottom:4px;">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Payment Window Ended
+                    </div>
+                    <div style="font-size:12px; color:#475569; margin-bottom:10px;">
+                        Did you transfer ₹${Number(displayAmount).toFixed(2)} on Google Pay or PhonePe?
+                    </div>
+                    <div style="display:flex; gap:8px; justify-content:center;">
+                        <button type="button" onclick="confirmPaymentNow()" style="background:#16a34a; color:white; border:none; padding:9px 18px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; box-shadow:0 2px 8px rgba(22,163,74,0.3);">
+                            <i class="fa-solid fa-check"></i> Yes, I Have Paid
+                        </button>
+                        <a href="my_orders.php" style="background:#f1f5f9; color:#334155; padding:9px 14px; border-radius:8px; text-decoration:none; font-size:13px; font-weight:600;">
+                            View Orders
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
         return;
     }
 
@@ -1212,7 +1228,7 @@ async function checkPayment(isManual = false) {
 
     try {
         const response = await fetch(
-            "check_uropay_status.php?order_id=" + encodeURIComponent(orderId) + "&t=" + Date.now(),
+            "check_uropay_status.php?order_id=" + encodeURIComponent(orderId) + "&local_id=" + localOrderId + "&t=" + Date.now(),
             { method: "GET", cache: "no-store" }
         );
 
@@ -1241,14 +1257,25 @@ async function checkPayment(isManual = false) {
         }
 
         if (isManual && statusText) {
-            statusText.innerHTML = "<i class='fa-solid fa-clock-rotate-left'></i> Bank: Pending. If already transferred via UPI app, enter the 12-digit UTR below to confirm!";
+            statusText.innerHTML = `
+                <div style="padding:6px 0;">
+                    <div style="font-weight:700; color:#15803d; font-size:14px; margin-bottom:4px;">
+                        <i class="fa-solid fa-circle-check"></i> Already paid ₹${Number(displayAmount).toFixed(2)} via UPI?
+                    </div>
+                    <div style="font-size:12px; color:#475569; margin-bottom:8px;">
+                        Confirm now to send your order straight to the kitchen:
+                    </div>
+                    <button type="button" onclick="confirmPaymentNow()" style="background:#16a34a; color:white; border:none; padding:10px 18px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer; width:100%; box-shadow:0 4px 12px rgba(22,163,74,0.3);">
+                        <i class="fa-solid fa-bolt"></i> Confirm Order & Send to Kitchen
+                    </button>
+                </div>
+            `;
             if (statusBox) statusBox.className = "status-box checking";
             
             const utrBox = document.getElementById("manualUtrInput");
             if (utrBox) {
                 utrBox.style.borderColor = "#16a34a";
                 utrBox.style.boxShadow = "0 0 0 3px rgba(22, 163, 74, 0.35)";
-                utrBox.focus();
             }
         }
     } catch (error) {
@@ -1263,6 +1290,34 @@ async function checkPayment(isManual = false) {
 
 function checkPaymentManual() {
     checkPayment(true);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIRM PAYMENT INSTANTLY (Auto-close & transition to kitchen prep)
+// ─────────────────────────────────────────────────────────────────────────────
+async function confirmPaymentNow(utr = '') {
+    if (paymentTimer)   clearInterval(paymentTimer);
+    if (countdownTimer) clearInterval(countdownTimer);
+
+    const statusText = document.getElementById("statusText");
+    const statusBox  = document.getElementById("statusBox");
+    if (statusText) statusText.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Confirming order with canteen...";
+    if (statusBox)  statusBox.className = "status-box checking";
+
+    try {
+        let url = "check_uropay_status.php?order_id=" + encodeURIComponent(orderId) + "&local_id=" + localOrderId + "&confirm_paid=1&t=" + Date.now();
+        if (utr) url += "&utr=" + encodeURIComponent(utr);
+        const res = await fetch(url, { method: "GET", cache: "no-store" });
+        const data = await res.json();
+        redirectToSuccess(data.payment_id || orderId);
+    } catch(e) {
+        console.error("Auto confirm error:", e);
+        redirectToSuccess(orderId);
+    }
+}
+
+function confirmAndGoToOrders() {
+    confirmPaymentNow();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1284,7 +1339,7 @@ function startPaymentTracking(trackOrderId) {
     paymentTimer = setInterval(async () => {
         try {
             const response = await fetch(
-                "check_uropay_status.php?order_id=" + encodeURIComponent(trackOrderId) + "&t=" + Date.now(),
+                "check_uropay_status.php?order_id=" + encodeURIComponent(trackOrderId) + "&local_id=" + localOrderId + "&t=" + Date.now(),
                 { cache: "no-store" }
             );
             const data = await response.json();
@@ -1391,7 +1446,7 @@ async function submitManualUtr() {
     msg.innerText = "Verifying UTR with bank...";
 
     try {
-        const res = await fetch("check_uropay_status.php?order_id=" + encodeURIComponent(orderId) + "&utr=" + encodeURIComponent(utr) + "&t=" + Date.now(), { cache: "no-store" });
+        const res = await fetch("check_uropay_status.php?order_id=" + encodeURIComponent(orderId) + "&local_id=" + localOrderId + "&utr=" + encodeURIComponent(utr) + "&t=" + Date.now(), { cache: "no-store" });
         const data = await res.json();
 
         if (data.success && (data.status === "PAID" || data.status === "Completed")) {

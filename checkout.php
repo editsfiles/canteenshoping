@@ -1,5 +1,4 @@
 <?php
-session_start();
 include("php/db.php");
 
 if (!isset($_SESSION['user_id'])) {
@@ -50,6 +49,9 @@ if (empty($cartItems)) {
         $total = (float)$rDef['price'];
     }
 }
+$gst = round($total * 0.06, 2);
+$platformFee = 0.00;
+$grandTotal = round($total + $gst + $platformFee, 2);
 
 $userName = $_SESSION['user_name'] ?? ($_SESSION['name'] ?? 'Customer');
 ?>
@@ -531,29 +533,16 @@ body {
                 <span>₹<?php echo number_format($total, 2); ?></span>
             </div>
             <div class="total-row">
+                <span>GST & Taxes (6%)</span>
+                <span>₹<?php echo number_format($gst, 2); ?></span>
+            </div>
+            <div class="total-row">
                 <span>Platform Fee</span>
-                <span style="color:#16a34a;font-weight:600;">FREE</span>
+                <span style="color:#16a34a;font-weight:600;">FREE (₹0)</span>
             </div>
             <div class="total-row">
                 <span>Total Payable</span>
-                <span>₹<?php echo number_format($total, 2); ?></span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ─── PAYMENT METHOD CARD ──────────────────────────────────────────────── -->
-<div class="card">
-    <div class="card-header">
-        <div class="icon" style="background:#f0fdf4;color:#16a34a;"><i class="fa-solid fa-shield-halved"></i></div>
-        Payment Method
-    </div>
-    <div class="card-body">
-        <div class="upi-badge">
-            <div class="upi-logo">📱</div>
-            <div class="upi-text">
-                <strong>Instant UPI / QR Payment</strong>
-                <span>Instant bank transfer · 256-bit encrypted</span>
+                <span>₹<?php echo number_format($grandTotal, 2); ?></span>
             </div>
         </div>
     </div>
@@ -562,10 +551,10 @@ body {
 <!-- ─── PAY BUTTON ───────────────────────────────────────────────────────── -->
 <div style="max-width:640px;margin:0 auto;">
     <form action="create_order.php" method="POST" id="checkoutForm">
-        <input type="hidden" name="amount" value="<?php echo $total; ?>">
+        <input type="hidden" name="amount" value="<?php echo $grandTotal; ?>">
         <button type="button" class="pay-btn" id="payNowBtn" onclick="openPaymentModal()">
             <i class="fa-solid fa-lock lock-icon"></i>
-            Pay ₹<?php echo number_format($total, 2); ?> Securely
+            Pay ₹<?php echo number_format($grandTotal, 2); ?> Securely
             <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:13px;opacity:0.7;"></i>
         </button>
     </form>
@@ -590,7 +579,7 @@ body {
             </button>
             <div class="brand">🍴 College Canteen</div>
             <div class="amount-display">
-                <sup>₹</sup><?php echo number_format($total, 2); ?>
+                <sup>₹</sup><?php echo number_format($grandTotal, 2); ?>
             </div>
         </div>
 
