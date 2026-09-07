@@ -477,27 +477,10 @@ body {
 </head>
 <body>
 
-<!-- ─── MOBILE APP HEADER ────────────────────────────────────────────────── -->
-<header class="app-header">
-    <div class="header-top">
-        <div class="header-brand">
-            <a href="menu.php"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i></a>
-            <span>🛒 My Cart</span>
-        </div>
-        <div class="header-item-count">
-            <?php echo count($cartItems); ?> Items
-        </div>
-    </div>
-    <nav class="header-nav">
-        <a href="index.php"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="menu.php"><i class="fa-solid fa-utensils"></i> Menu</a>
-        <a href="cart.php" class="active"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-        <a href="my_orders.php"><i class="fa-solid fa-receipt"></i> Orders</a>
-        <a href="profile.php"><i class="fa-solid fa-user"></i> Profile</a>
-        <a href="contact.php"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-    </nav>
-</header>
+<?php 
+$currentPage = 'cart';
+include("php/navbar.php"); 
+?>
 
 <div class="cart-wrap">
 

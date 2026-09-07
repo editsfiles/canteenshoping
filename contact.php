@@ -801,29 +801,7 @@ nav a:hover {
      HEADER
 ========================================================= -->
 
-<header>
-
-    <h2>📞 Contact Us</h2>
-
-    <nav>
-
-        <a href="index.php">Home</a>
-
-        <a href="menu.php">Menu</a>
-
-        <a href="cart.php">Cart</a>
-
-        <a href="my_orders.php">My Orders</a>
-
-        <a href="profile.php">Profile</a>
-
-        <a href="contact.php">Contact</a>
-
-        <a href="logout.php">Logout</a>
-
-    </nav>
-
-</header>
+<?php include("php/navbar.php"); ?>
 
 
 <!-- =========================================================

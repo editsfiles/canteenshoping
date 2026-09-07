@@ -378,20 +378,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-<header>
-    <div class="logo">
-        🍽 College Canteen
-    </div>
-    <nav>
-        <a href="index.php">Home</a>
-        <a href="menu.php">Menu</a>
-        <a href="cart.php">Cart</a>
-        <a href="my_orders.php">My Orders</a>
-        <a href="profile.php" style="color:#ffffff; text-decoration:underline;">Profile</a>
-        <a href="contact.php">Contact</a>
-        <a href="logout.php">Logout</a>
-    </nav>
-</header>
+<?php include("php/navbar.php"); ?>
 
 <div class="container">
 

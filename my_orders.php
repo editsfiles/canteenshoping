@@ -563,36 +563,7 @@ mysqli_stmt_close($stmt);
      HEADER
      ========================================================= -->
 
-<header>
-
-    <h2>
-        🧾 My Orders
-    </h2>
-
-
-    <div>
-
-        <nav>
-
-            <a href="index.php">Home</a>
-
-            <a href="menu.php">Menu</a>
-
-            <a href="cart.php">Cart</a>
-
-            <a href="my_orders.php">My Orders</a>
-
-            <a href="profile.php">Profile</a>
-
-            <a href="contact.php">Contact</a>
-
-            <a href="logout.php">Logout</a>
-
-        </nav>
-
-    </div>
-
-</header>
+<?php include("php/navbar.php"); ?>
 
 
 

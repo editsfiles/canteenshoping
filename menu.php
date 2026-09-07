@@ -39,28 +39,7 @@ if (isset($_GET['search']) && trim($_GET['search']) != "") {
 <link rel="apple-touch-icon" href="uploads/Burger.jpg">
 </head>
 <body>
-<header>
-<h2>🍽 College Canteen</h2>
-<div>
-<nav>
-
-<a href="index.php">Home</a>
-
-<a href="menu.php">Menu</a>
-
-<a href="cart.php">Cart</a>
-
-<a href="my_orders.php">My Orders</a>
-
-<a href="profile.php">Profile</a>
-
-<a href="contact.php">Contact</a>
-
-<a href="logout.php">Logout</a>
-
-</nav>
-</div>
-</header>
+<?php include("php/navbar.php"); ?>
 
 <div class="container">
 <div class="search-box">
