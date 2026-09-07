@@ -9,7 +9,7 @@ A full-featured College Canteen Management System built with PHP and MySQL. Incl
 ### 👨‍🎓 Student / Customer Portal
 * **User Authentication**: Secure registration and login with bcrypt password hashing and OTP-based password resets via Gmail SMTP.
 * **Interactive Food Menu**: Browse categories, search food items, adjust quantities, and add to cart with real-time price calculations.
-* **Checkout & Order Processing**: 5% GST calculation, customer details confirmation, and instant order creation.
+* **Checkout & Order Processing**: 3% GST calculation, customer details confirmation, and instant order creation.
 * **Dynamic UPI Payments**:
   * Scannable UPI QR code with a 10-minute live countdown timer.
   * Dedicated **Merchant UPI ID / VPA Card** with one-click copy for mobile app payments.

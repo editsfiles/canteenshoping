@@ -533,7 +533,7 @@ body {
                 <span>₹<?php echo number_format($total, 2); ?></span>
             </div>
             <div class="total-row">
-                <span>GST & Taxes (6%)</span>
+                <span>GST & Taxes (3%)</span>
                 <span>₹<?php echo number_format($gst, 2); ?></span>
             </div>
             <div class="total-row">
