@@ -713,7 +713,7 @@ if ($activeStmt) {
 
     <!-- FOOTER -->
     <footer class="canteen-footer">
-        <div>&copy; <?php echo date('Y'); ?> <strong>College Canteen Ordering Portal</strong> &bull; All Rights Reserved</div>
+        <div><strong>College Canteen Ordering Portal</strong></div>
     </footer>
 
     <!-- PWA & APP DOWNLOAD BANNER -->

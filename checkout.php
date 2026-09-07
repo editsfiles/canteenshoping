@@ -842,7 +842,7 @@ function closeModal() {
     const btn = document.getElementById("payNowBtn");
     if (btn) {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-lock lock-icon"></i> Pay ₹<?php echo number_format($total, 2); ?> Securely <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:13px;opacity:0.7;"></i>';
+        btn.innerHTML = '<i class="fa-solid fa-lock lock-icon"></i> Pay ₹<?php echo number_format($grandTotal, 2); ?> Securely <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:13px;opacity:0.7;"></i>';
     }
     isSubmitting = false;
 }
