@@ -350,21 +350,6 @@ if (isset($_POST['login'])) {
             text-decoration: underline;
         }
 
-        /* Persistent login badge */
-        .persistent-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 22px;
-            padding: 9px 12px;
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 10px;
-            font-size: 12px;
-            color: #166534;
-            font-weight: 600;
-        }
 
         @media (max-width: 480px) {
             body {
@@ -458,10 +443,6 @@ if (isset($_POST['login'])) {
 
             </form>
 
-            <div class="persistent-badge">
-                <i class="fa-solid fa-shield-check"></i>
-                <span>Persistent Login Active · Stay Signed In</span>
-            </div>
 
             <div class="auth-footer">
                 <a href="forgot_password.php" class="auth-link">
