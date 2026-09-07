@@ -160,7 +160,7 @@ function sendOrderInvoiceEmail($orderId, $conn)
                             <td style='padding:8px 12px; text-align:right;'>₹" . number_format($subtotal, 2) . "</td>
                         </tr>
                         <tr>
-                            <td colspan='3' style='padding:8px 12px; text-align:right; font-weight:600; color:#64748b;'>GST (5%):</td>
+                            <td colspan='3' style='padding:8px 12px; text-align:right; font-weight:600; color:#64748b;'>GST (3%):</td>
                             <td style='padding:8px 12px; text-align:right;'>₹" . number_format($gst, 2) . "</td>
                         </tr>
                         <tr style='font-size:16px; font-weight:bold; color:#16a34a; background:#f0fdf4;'>

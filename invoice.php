@@ -93,6 +93,18 @@ if ($itStmt) {
     mysqli_stmt_close($itStmt);
 }
 
+// Compute item subtotal and 3% GST
+$invoiceSubtotal = 0.0;
+foreach ($invoiceItems as $it) {
+    $invoiceSubtotal += (float)($it['subtotal'] ?? ($it['price'] * $it['quantity']));
+}
+if ($invoiceSubtotal > 0 && $invoiceSubtotal < $totalAmount) {
+    $invoiceGst = round($totalAmount - $invoiceSubtotal, 2);
+} else {
+    $invoiceSubtotal = round($totalAmount / 1.03, 2);
+    $invoiceGst = round($totalAmount - $invoiceSubtotal, 2);
+}
+
 
 // -----------------------------
 // FIND DATE COLUMN
@@ -934,7 +946,7 @@ body {
         <span>Subtotal</span>
 
         <strong>
-            ₹<?php echo number_format($totalAmount, 2); ?>
+            ₹<?php echo number_format($invoiceSubtotal, 2); ?>
         </strong>
 
     </div>
@@ -942,9 +954,9 @@ body {
 
     <div class="total-row">
 
-        <span>Tax</span>
+        <span>GST & Taxes (3%)</span>
 
-        <strong>₹0.00</strong>
+        <strong>₹<?php echo number_format($invoiceGst, 2); ?></strong>
 
     </div>
 

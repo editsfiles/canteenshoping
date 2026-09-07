@@ -961,7 +961,8 @@ foreach ($orders as $row) {
         const el = document.getElementById('studentLiveClock');
         if (!el) return;
         try {
-            const options = 
+            const options = {
+                timeZone: 'Asia/Kolkata',
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',

@@ -49,7 +49,7 @@ if (empty($cartItems)) {
         $total = (float)$rDef['price'];
     }
 }
-$gst = round($total * 0.06, 2);
+$gst = round($total * 0.03, 2);
 $platformFee = 0.00;
 $grandTotal = round($total + $gst + $platformFee, 2);
 

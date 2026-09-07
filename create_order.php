@@ -81,7 +81,7 @@ foreach ($_SESSION['cart'] as $id => $qty) {
 
 $gst =
     round(
-        $total * 0.06,
+        $total * 0.03,
         2
     );
 
