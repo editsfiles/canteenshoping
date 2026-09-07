@@ -38,6 +38,21 @@
         </div>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
+        <a href="CanteenApp.apk" download style="
+            background: #0ea5e9;
+            color: white;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        ">
+            <i class="fa-solid fa-download"></i> APK
+        </a>
         <button id="pwaInstallBtn" type="button" style="
             background: #16a34a;
             color: white;
