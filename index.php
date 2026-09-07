@@ -713,7 +713,7 @@ if ($activeStmt) {
 
     <!-- FOOTER -->
     <footer class="canteen-footer">
-        <div>College Canteen Ordering Portal</div>
+       <strong> <div>College Canteen Ordering Portal</div></strong>
     </footer>
 
     <!-- PWA & APP DOWNLOAD BANNER -->
