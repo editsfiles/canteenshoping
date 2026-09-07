@@ -2,6 +2,19 @@
 
 date_default_timezone_set('Asia/Kolkata');
 
+// Configure 1-Year Persistent Sessions (Never Logout Automatically)
+if (session_status() === PHP_SESSION_NONE) {
+    $sessionLifetime = 365 * 24 * 60 * 60; // 1 year (31,536,000 seconds)
+    @ini_set('session.gc_maxlifetime', (string)$sessionLifetime);
+    @session_set_cookie_params([
+        'lifetime' => $sessionLifetime,
+        'path'     => '/',
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+    @session_start();
+}
+
 $url = getenv('DATABASE_URL') ?: getenv('MYSQL_URL');
 $host = getenv('DB_HOST') ?: '127.0.0.1';
 $user = getenv('DB_USER') ?: 'root';
@@ -150,6 +163,33 @@ if ($conn) {
         }
         if (!in_array('refund_notes', $oFields)) {
             @mysqli_query($conn, "ALTER TABLE orders ADD COLUMN refund_notes VARCHAR(255) DEFAULT NULL AFTER refund_status");
+        }
+    }
+}
+
+// Permanent Session Restorer: Auto-login from persistent cookie if session was cleared
+if ($conn && empty($_SESSION['user_id']) && !empty($_COOKIE['canteen_student_auth'])) {
+    $authParts = explode(':', $_COOKIE['canteen_student_auth'], 2);
+    if (count($authParts) === 2) {
+        $cUserId = (int)$authParts[0];
+        $cToken  = $authParts[1];
+        if ($cUserId > 0 && !empty($cToken)) {
+            $cStmt = @mysqli_prepare($conn, "SELECT id, name, email, password FROM users WHERE id = ? LIMIT 1");
+            if ($cStmt) {
+                mysqli_stmt_bind_param($cStmt, "i", $cUserId);
+                mysqli_stmt_execute($cStmt);
+                $cRes = mysqli_stmt_get_result($cStmt);
+                if ($cRow = mysqli_fetch_assoc($cRes)) {
+                    $expectedToken = hash_hmac('sha256', (string)$cRow['id'] . (string)$cRow['password'], 'canteen_app_secret_key_2026');
+                    if (hash_equals($expectedToken, $cToken)) {
+                        $_SESSION['user_id']    = (int)$cRow['id'];
+                        $_SESSION['user_name']  = $cRow['name'];
+                        $_SESSION['name']       = $cRow['name'];
+                        $_SESSION['user_email'] = $cRow['email'];
+                    }
+                }
+                mysqli_stmt_close($cStmt);
+            }
         }
     }
 }

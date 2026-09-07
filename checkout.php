@@ -552,7 +552,7 @@ body {
         <div class="upi-badge">
             <div class="upi-logo">📱</div>
             <div class="upi-text">
-                <strong>UroPay Secure UPI</strong>
+                <strong>Instant UPI / QR Payment</strong>
                 <span>Instant bank transfer · 256-bit encrypted</span>
             </div>
         </div>
@@ -571,7 +571,7 @@ body {
     </form>
     <p class="secure-note">
         <i class="fa-solid fa-shield-check" style="color:#16a34a;"></i>
-        Secured by UroPay · No card details stored
+        100% Secure Canteen Payment · 256-bit Encrypted
     </p>
 </div>
 
@@ -637,7 +637,7 @@ body {
         <!-- Footer security strip -->
         <div class="modal-footer">
             <i class="fa-solid fa-lock"></i>
-            256-bit SSL Encrypted · UroPay Certified · Powered by NPCI
+            256-bit SSL Encrypted · Verified Secure Payment · Powered by NPCI
         </div>
     </div>
 

@@ -86,7 +86,7 @@ if (!empty($refId)) {
             $errorMsg = null;
         }
     } elseif (!$checkResult && ($httpCode !== 200 || $curlErr)) {
-        $errorMsg = "Payment Reference ID / UTR not found on gateway. Please verify the 12-digit UPI number or UroPay Order ID.";
+        $errorMsg = "Payment Reference ID / UTR not found. Please verify the 12-digit UPI reference number or Order ID.";
     }
 }
 ?>
@@ -335,14 +335,14 @@ p.subtitle {
         <i class="fa-solid fa-magnifying-glass-dollar" style="color:#2563eb;"></i>
         Verify Payment by Reference ID
     </h1>
-    <p class="subtitle">Enter the UroPay Reference ID (e.g. <code>URPYKILO252051</code>) to check bank receipt status in real time.</p>
+    <p class="subtitle">Enter the Payment Reference ID (e.g. <code>CANTEEN12</code>) or UTR to check bank receipt status in real time.</p>
 
     <form method="GET" class="search-form">
         <input 
             type="text" 
             name="ref" 
             class="search-input" 
-            placeholder="Enter Payment Ref ID (e.g. URPYKILO252051)"
+            placeholder="Enter Payment Ref ID / UTR (e.g. CANTEEN12)"
             value="<?php echo htmlspecialchars($refId); ?>"
             required
         >

@@ -735,7 +735,7 @@ foreach ($orders as $row) {
     <td><strong style="color:#27ae60;">₹<?php echo number_format($totalAmount, 2); ?></strong></td>
     <td>
         <?php if (strtolower(trim($paymentMethod)) === "uropay"): ?>
-            <span class="payment-uropay">📱 UroPay</span>
+            <span class="payment-uropay">📱 Instant UPI</span>
         <?php else: ?>
             <?php echo htmlspecialchars($paymentMethod); ?>
         <?php endif; ?>
@@ -900,7 +900,7 @@ foreach ($orders as $row) {
                 <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">Payment</div>
                 <div class="mobile-pay-badge">
                     <?php if (strtolower(trim($paymentMethod)) === "uropay"): ?>
-                        <span class="payment-uropay" style="padding:3px 8px; font-size:11px;">📱 UroPay</span>
+                        <span class="payment-uropay" style="padding:3px 8px; font-size:11px;">📱 UPI / Online</span>
                     <?php else: ?>
                         <?php echo htmlspecialchars($paymentMethod); ?>
                     <?php endif; ?>

@@ -925,7 +925,7 @@ body {
             <i class="fa-solid fa-list"></i> My Orders
         </a>
         <a href="verify_ref.php?ref=<?php echo urlencode($uroPayOrderId); ?>" target="_blank" style="color:#2563eb; font-weight:600;">
-            <i class="fa-solid fa-magnifying-glass"></i> Check Gateway
+            <i class="fa-solid fa-receipt"></i> Verify Receipt
         </a>
         <a href="payment_failed.php" class="cancel">
             <i class="fa-solid fa-xmark"></i> Cancel

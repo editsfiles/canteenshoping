@@ -31,8 +31,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Target Production URL (Can be changed to http://10.0.2.2/Canteenshoping for local emulator)
-    public static final String APP_URL = "https://canteenshoping.onrender.com";
+    // Local Canteen Server Endpoint (Uses local MySQL database directly without Render)
+    public static final String LOCAL_LAN_URL = "http://172.29.247.177/Canteenshoping";
+    public static final String EMULATOR_URL  = "http://10.0.2.2/Canteenshoping";
+    public static final String APP_URL       = LOCAL_LAN_URL;
 
     private WebView webView;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -300,6 +302,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        CookieManager.getInstance().flush();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         CookieManager.getInstance().flush();
     }
 
