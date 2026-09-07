@@ -565,8 +565,8 @@ $activePage = 'settings';
                     <p style="margin:0 0 12px 0; font-size:13px; color:#64748b;">
                         Pre-configured file for Microsoft Excel with automatic background database queries enabled.
                     </p>
-                    <a href="export_registrations_excel.php?format=iqy" class="btn-material btn-success" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-                        <i class="fa-solid fa-download"></i> Download canteen_registrations_live.iqy
+                    <a href="export_users_live.php?format=iqy" class="btn-material btn-success" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-download"></i> Download Canteen_Registered_Users_Live.iqy
                     </a>
                 </div>
 
@@ -579,7 +579,7 @@ $activePage = 'settings';
                         <input type="text" id="liveSyncUrlInput" readonly value="<?php 
                             $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
                             $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-                            echo htmlspecialchars($proto . $host . dirname($_SERVER['SCRIPT_NAME']) . '/export_registrations_excel.php?format=web&key=canteen_live_sync');
+                            echo htmlspecialchars($proto . $host . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\') . '/export_users_live.php?key=canteen_live_sync_2026');
                         ?>" style="flex:1; padding:9px 12px; border:1px solid #cbd5e1; border-radius:6px; font-family:monospace; font-size:12px; background:#fff; color:#334155;">
                         <button type="button" onclick="copyLiveSyncUrl()" id="copySyncBtn" style="background:#0f172a; color:#fff; border:none; padding:8px 16px; border-radius:6px; font-weight:600; font-size:13px; cursor:pointer;">
                             <i class="fa-regular fa-copy"></i> Copy Link

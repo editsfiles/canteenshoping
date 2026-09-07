@@ -109,6 +109,7 @@ CREATE TABLE `users` (
   `regno` varchar(100) NOT NULL,
   `department` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
@@ -117,9 +118,9 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Demo Student: mohanraj.s4211@gmail.com / pass: 12345
-INSERT INTO `users` (`id`, `name`, `regno`, `department`, `email`, `password`, `created_at`) VALUES
-(1, 'mohanraj', '13562', 'BCA', 'mohanraj.s4211@gmail.com', '12345', NOW())
-ON DUPLICATE KEY UPDATE `password` = '12345';
+INSERT INTO `users` (`id`, `name`, `regno`, `department`, `email`, `phone`, `password`, `created_at`) VALUES
+(1, 'mohanraj', '13562', 'BCA', 'mohanraj.s4211@gmail.com', '9952611859', '12345', NOW())
+ON DUPLICATE KEY UPDATE `password` = '12345', `phone` = '9952611859';
 
 
 -- --------------------------------------------------------

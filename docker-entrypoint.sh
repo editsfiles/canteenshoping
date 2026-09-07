@@ -67,11 +67,12 @@ EOF
             echo "$DB_NAME already contains $TABLES_EXIST tables."
         fi
 
-        # Ensure default admin and demo student passwords are confirmed valid
+        # Ensure phone column exists and passwords / phone numbers are synced
         mysql "$DB_NAME" -e "
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(20) DEFAULT NULL AFTER email;
             UPDATE admins SET password='12345' WHERE username='admin';
             UPDATE admin SET password='12345' WHERE username='admin';
-            UPDATE users SET password='12345' WHERE email='mohanraj.s4211@gmail.com';
+            UPDATE users SET password='12345', phone='9952611859' WHERE email='mohanraj.s4211@gmail.com';
         " 2>/dev/null || true
     else
         echo "Warning: MariaDB did not become ready; continuing so external-db deployments can still start."

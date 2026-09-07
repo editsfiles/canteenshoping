@@ -12,6 +12,7 @@
 webhook_log.txt
 *cookie*.txt
 phone_*.png
+scratch/
 
 # Android build outputs & caches
 android_app/.gradle/
