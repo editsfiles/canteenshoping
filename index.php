@@ -1,8 +1,13 @@
 <?php
 include("php/db.php");
 
-$userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
-$displayName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? $_SESSION['username'] ?? ($userId > 0 ? 'Student' : 'Foodie');
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$userId = (int)$_SESSION['user_id'];
+$displayName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? $_SESSION['username'] ?? 'Student';
 
 // Dynamic Greeting based on time of day (Asia/Kolkata)
 $hour = (int)date('H');

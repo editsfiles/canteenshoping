@@ -220,6 +220,41 @@ if (isset($_POST['login'])) {
             font-weight: 500;
         }
 
+        /* SEGMENTED AUTH TABS: SIGN IN / REGISTER */
+        .auth-tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 14px;
+            padding: 4px;
+            margin-top: 18px;
+            margin-bottom: 22px;
+            gap: 4px;
+            border: 1px solid #e2e8f0;
+        }
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 14px;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #64748b;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+        .auth-tab:hover {
+            color: #0f172a;
+        }
+        .auth-tab.active {
+            background: #ffffff;
+            color: #059669;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
         .alert-card {
             padding: 12px 16px;
             border-radius: var(--radius-md);
@@ -393,8 +428,18 @@ if (isset($_POST['login'])) {
                 <div class="brand-icon-wrap">
                     <i class="fa-solid fa-utensils"></i>
                 </div>
-                <h1 class="brand-title">Welcome Back</h1>
-                <p class="brand-subtitle">Sign in to order canteen meals without waiting</p>
+                <h1 class="brand-title">Welcome to Canteen</h1>
+                <p class="brand-subtitle">Sign in or register to order meals without waiting</p>
+
+                <!-- SWITCHABLE AUTH TABS -->
+                <div class="auth-tabs">
+                    <a href="login.php<?php echo !empty($rawRedirect) && $rawRedirect !== 'index.php' ? '?redirect=' . urlencode($rawRedirect) : ''; ?>" class="auth-tab active">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+                    </a>
+                    <a href="register.php<?php echo !empty($rawRedirect) && $rawRedirect !== 'index.php' ? '?redirect=' . urlencode($rawRedirect) : ''; ?>" class="auth-tab">
+                        <i class="fa-solid fa-user-plus"></i> Create Account
+                    </a>
+                </div>
             </div>
 
             <?php echo $message; ?>
