@@ -4,22 +4,7 @@
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-
-    <!-- Query packages for native UPI apps on Android 11+ (API 30+) -->
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:scheme="upi" />
-        </intent>
-        <package android:name="com.google.android.apps.nbu.paisa.user" /> <!-- Google Pay -->
-        <package android:name="com.phonepe.app" />                      <!-- PhonePe -->
-        <package android:name="net.one97.paytm" />                      <!-- Paytm -->
-        <package android:name="in.org.npci.upiapp" />                   <!-- BHIM -->
-    </queries>
-
+    
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -32,23 +17,14 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout"
+            android:theme="@style/Theme.CollegeCanteen"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
-            <!-- Handle deep links -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="canteen" />
-                <data android:scheme="http" android:host="172.29.247.177" />
-            </intent-filter>
         </activity>
-
+            
     </application>
 
 </manifest>
