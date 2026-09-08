@@ -12,8 +12,8 @@ DB_NAME="${DB_NAME:-canteen_db}"
 DB_USER="${DB_USER:-root}"
 DB_PASSWORD="${DB_PASSWORD:-}"
 
-if [ -n "$DB_HOST" ] && [ "$DB_HOST" != "localhost" ] && [ "$DB_HOST" != "127.0.0.1" ]; then
-    echo "Using configured external database at: $DB_HOST"
+if [ -n "$DATABASE_URL" ] || ([ -n "$DB_HOST" ] && [ "$DB_HOST" != "localhost" ] && [ "$DB_HOST" != "127.0.0.1" ]); then
+    echo "Using configured external database..."
 else
     echo "Configuring MariaDB service inside container..."
     mkdir -p /run/mysqld /var/run/mysqld /var/lib/mysql /var/log/mysql /etc/mysql/conf.d

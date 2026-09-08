@@ -15,6 +15,28 @@ if (session_status() === PHP_SESSION_NONE) {
     @session_start();
 }
 
+// Load local .env if present (kept out of git to prevent secret leaks)
+$envPath = __DIR__ . '/../.env';
+if (file_exists($envPath)) {
+    $envLines = @file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($envLines) {
+        foreach ($envLines as $line) {
+            $line = trim($line);
+            if ($line === '' || $line[0] === '#') continue;
+            if (strpos($line, '=') !== false) {
+                list($k, $v) = explode('=', $line, 2);
+                $k = trim($k);
+                $v = trim($v, " \t\n\r\0\x0B\"'");
+                if (!getenv($k)) {
+                    putenv("$k=$v");
+                    $_ENV[$k] = $v;
+                    $_SERVER[$k] = $v;
+                }
+            }
+        }
+    }
+}
+
 $url = getenv('DATABASE_URL') ?: getenv('MYSQL_URL');
 $host = getenv('DB_HOST') ?: '127.0.0.1';
 $user = getenv('DB_USER') ?: 'root';
@@ -110,6 +132,14 @@ if (!$conn && ($host === 'localhost' || $host === '127.0.0.1' || empty($host))) 
                 break 2;
             }
         }
+    }
+}
+
+// Fallback to local MariaDB/MySQL if cloud DB is unreachable or sleeping
+if (!$conn) {
+    $fallbackConn = @mysqli_connect('127.0.0.1', 'root', '', 'canteen_db', 3306);
+    if ($fallbackConn) {
+        $conn = $fallbackConn;
     }
 }
 

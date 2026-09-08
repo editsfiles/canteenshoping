@@ -9,6 +9,8 @@ services:
     autoDeploy: true
     dockerfilePath: ./Dockerfile
     envVars:
+      - key: DATABASE_URL
+        sync: false
       - key: DB_HOST
         value: 127.0.0.1
       - key: DB_USER
