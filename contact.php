@@ -1,10 +1,6 @@
 <?php
 include("php/db.php");
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
 
 /* Always define message first */
 $message = "";

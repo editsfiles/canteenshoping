@@ -2,7 +2,7 @@
 include("php/db.php");
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: login.php?redirect=checkout.php");
     exit();
 }
 

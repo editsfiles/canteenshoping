@@ -310,6 +310,27 @@ $curPage = basename($_SERVER['PHP_SELF'] ?? 'index.php');
     background: #fef2f2;
 }
 
+/* GUEST SIGN IN PILL */
+.nav-signin-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff !important;
+    font-size: 13.5px;
+    font-weight: 700;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transition: all 0.2s ease;
+}
+.nav-signin-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
+    color: #ffffff !important;
+}
+
 /* MOBILE HAMBURGER BUTTON */
 .canteen-menu-toggle {
     display: none;
@@ -542,7 +563,8 @@ $curPage = basename($_SERVER['PHP_SELF'] ?? 'index.php');
         <!-- TOP RIGHT ACTIONS -->
         <div class="canteen-nav-right">
 
-            <!-- USER PROFILE CAPSULE & DROPDOWN -->
+            <!-- USER PROFILE CAPSULE OR SIGN IN -->
+            <?php if (!empty($_SESSION['user_id'])): ?>
             <div class="user-profile-menu">
                 <button type="button" class="user-profile-btn" id="userProfileBtn" aria-label="User Profile Menu">
                     <div class="user-avatar-circle">
@@ -575,6 +597,12 @@ $curPage = basename($_SERVER['PHP_SELF'] ?? 'index.php');
                     </a>
                 </div>
             </div>
+            <?php else: ?>
+            <a href="login.php" class="nav-signin-pill">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                <span>Sign In</span>
+            </a>
+            <?php endif; ?>
 
             <!-- MOBILE MENU TOGGLE BUTTON -->
             <button type="button" class="canteen-menu-toggle" id="mobileMenuBtn" aria-label="Toggle navigation menu">
@@ -607,19 +635,28 @@ $curPage = basename($_SERVER['PHP_SELF'] ?? 'index.php');
             <span><i class="fa-solid fa-receipt" style="color:#8b5cf6;"></i> My Orders</span>
             <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.4;"></i>
         </a>
+        <?php if (!empty($_SESSION['user_id'])): ?>
         <a href="profile.php" class="mobile-nav-item <?php echo ($curPage === 'profile.php') ? 'active' : ''; ?>">
             <span><i class="fa-solid fa-user" style="color:#10b981;"></i> My Account</span>
             <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.4;"></i>
         </a>
+        <?php endif; ?>
         <a href="contact.php" class="mobile-nav-item <?php echo ($curPage === 'contact.php') ? 'active' : ''; ?>">
             <span><i class="fa-solid fa-headset" style="color:#ec4899;"></i> Help & Support</span>
             <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.4;"></i>
         </a>
         <div style="height:1px; background:#e2e8f0; margin:8px 0;"></div>
+        <?php if (!empty($_SESSION['user_id'])): ?>
         <a href="logout.php" class="mobile-nav-item" style="color:#dc2626;">
             <span><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</span>
             <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.4;"></i>
         </a>
+        <?php else: ?>
+        <a href="login.php" class="mobile-nav-item" style="color:#10b981; font-weight:700;">
+            <span><i class="fa-solid fa-arrow-right-to-bracket" style="color:#10b981;"></i> Sign In / Register</span>
+            <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.4;"></i>
+        </a>
+        <?php endif; ?>
     </div>
 </header>
 
@@ -644,10 +681,17 @@ $curPage = basename($_SERVER['PHP_SELF'] ?? 'index.php');
         <i class="fa-solid fa-receipt"></i>
         <span>Orders</span>
     </a>
+    <?php if (!empty($_SESSION['user_id'])): ?>
     <a href="profile.php" class="bottom-nav-item <?php echo ($curPage === 'profile.php') ? 'active' : ''; ?>">
         <i class="fa-solid fa-user"></i>
         <span>Profile</span>
     </a>
+    <?php else: ?>
+    <a href="login.php" class="bottom-nav-item <?php echo ($curPage === 'login.php') ? 'active' : ''; ?>">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        <span>Sign In</span>
+    </a>
+    <?php endif; ?>
 </nav>
 
 <script>

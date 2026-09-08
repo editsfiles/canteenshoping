@@ -4,8 +4,14 @@ include("php/db.php");
 
 $message = "";
 
+$rawRedirect = $_GET['redirect'] ?? $_POST['redirect'] ?? 'index.php';
+$targetUrl = 'index.php';
+if (!empty($rawRedirect) && !preg_match('#^(?:[a-z]+:)?//#i', $rawRedirect)) {
+    $targetUrl = ltrim($rawRedirect, '/');
+}
+
 if (isset($_SESSION['user_id'])) {
-    header("Location: index.php");
+    header("Location: " . $targetUrl);
     exit();
 }
 
@@ -68,7 +74,7 @@ if (isset($_POST['login'])) {
                         'samesite' => 'Lax'
                     ]);
 
-                    header("Location: index.php");
+                    header("Location: " . $targetUrl);
                     exit();
                 } else {
                     $message = "<div class='alert-card error'><i class='fa-solid fa-circle-exclamation'></i> Incorrect password. Please try again.</div>";
@@ -394,6 +400,7 @@ if (isset($_POST['login'])) {
             <?php echo $message; ?>
 
             <form method="POST" autocomplete="on">
+                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($rawRedirect); ?>">
 
                 <div class="form-group">
                     <label class="form-label" for="loginIdentifier">

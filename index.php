@@ -1,13 +1,8 @@
 <?php
 include("php/db.php");
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
-$userId = (int)$_SESSION['user_id'];
-$displayName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? $_SESSION['username'] ?? 'Student';
+$userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+$displayName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? $_SESSION['username'] ?? ($userId > 0 ? 'Student' : 'Foodie');
 
 // Dynamic Greeting based on time of day (Asia/Kolkata)
 $hour = (int)date('H');
@@ -31,15 +26,17 @@ if ($hour >= 5 && $hour < 12) {
 
 // Check for any active ongoing orders for this user
 $activeOrder = null;
-$activeStmt = @$conn->prepare("SELECT id, total_amount, payment_status, status FROM orders WHERE user_id = ? AND status NOT IN ('delivered', 'cancelled', 'Delivered', 'Cancelled') ORDER BY id DESC LIMIT 1");
-if ($activeStmt) {
-    $activeStmt->bind_param("i", $userId);
-    $activeStmt->execute();
-    $orderRes = $activeStmt->get_result();
-    if ($orderRes && $orderRes->num_rows > 0) {
-        $activeOrder = $orderRes->fetch_assoc();
+if ($userId > 0) {
+    $activeStmt = @$conn->prepare("SELECT id, total_amount, payment_status, status FROM orders WHERE user_id = ? AND status NOT IN ('delivered', 'cancelled', 'Delivered', 'Cancelled') ORDER BY id DESC LIMIT 1");
+    if ($activeStmt) {
+        $activeStmt->bind_param("i", $userId);
+        $activeStmt->execute();
+        $orderRes = $activeStmt->get_result();
+        if ($orderRes && $orderRes->num_rows > 0) {
+            $activeOrder = $orderRes->fetch_assoc();
+        }
+        $activeStmt->close();
     }
-    $activeStmt->close();
 }
 ?>
 <!DOCTYPE html>

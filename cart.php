@@ -1,10 +1,6 @@
 <?php
 include("php/db.php");
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
 
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
@@ -623,7 +619,7 @@ include("php/navbar.php");
             <button type="submit" name="update" class="btn-update">
                 <i class="fa-solid fa-rotate"></i> Update Cart
             </button>
-            <a href="checkout.php" class="btn-checkout">
+            <a href="<?php echo !empty($_SESSION['user_id']) ? 'checkout.php' : 'login.php?redirect=checkout.php'; ?>" class="btn-checkout">
                 <span>Proceed to Pay ₹<?php echo number_format($grandTotal, 2); ?></span>
                 <i class="fa-solid fa-arrow-right"></i>
             </a>

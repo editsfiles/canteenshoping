@@ -1,5 +1,12 @@
 <?php
 // Reusable PWA Installation Banner & Service Worker Registrar
+// Suppress banner if accessed within Native Android App
+$isNativeApp = (isset($_GET['app']) && $_GET['app'] === '1') || 
+               (isset($_SERVER['HTTP_USER_AGENT']) && stripos($_SERVER['HTTP_USER_AGENT'], 'CollegeCanteenApp') !== false);
+
+if ($isNativeApp) {
+    return;
+}
 ?>
 <!-- PWA Install Banner & Head Tags -->
 <link rel="manifest" href="manifest.json">

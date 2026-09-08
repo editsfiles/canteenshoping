@@ -31,10 +31,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Local Canteen Server Endpoint (Uses local MySQL database directly without Render)
-    public static final String LOCAL_LAN_URL = "http://172.29.247.177/Canteenshoping";
-    public static final String EMULATOR_URL  = "http://10.0.2.2/Canteenshoping";
-    public static final String APP_URL       = LOCAL_LAN_URL;
+    // Production Cloud Server (Accessible globally on 4G/5G mobile data and outside campus)
+    public static final String RENDER_URL    = "https://canteenshoping.onrender.com/index.php?app=1";
+    // Local Campus LAN Server (Fallback when connected to local college Wi-Fi)
+    public static final String LOCAL_LAN_URL = "http://172.29.247.177/Canteenshoping/index.php?app=1";
+    // Android Emulator loopback
+    public static final String EMULATOR_URL  = "http://10.0.2.2/Canteenshoping/index.php?app=1";
+    public static final String APP_URL       = RENDER_URL;
 
     public static boolean isEmulator() {
         return Build.FINGERPRINT.startsWith("generic")
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static String getAppUrl() {
-        return isEmulator() ? EMULATOR_URL : LOCAL_LAN_URL;
+        return isEmulator() ? EMULATOR_URL : RENDER_URL;
     }
 
     private WebView webView;
@@ -270,6 +273,13 @@ public class MainActivity extends AppCompatActivity {
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             // Only show offline screen if the main frame failed to load
             if (request.isForMainFrame()) {
+                String failingUrl = (request.getUrl() != null) ? request.getUrl().toString() : "";
+                // If cloud Render was unreachable and we haven't tried local LAN fallback yet, try local LAN
+                if (failingUrl.contains("onrender.com") && !isEmulator()) {
+                    Log.w("CanteenApp", "Render unreachable, trying Local LAN fallback: " + LOCAL_LAN_URL);
+                    view.loadUrl(LOCAL_LAN_URL);
+                    return;
+                }
                 progressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
                 swipeRefreshLayout.setVisibility(View.GONE);
