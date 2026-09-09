@@ -50,9 +50,24 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val loginViewModel: LoginViewModel = viewModel(factory = factory)
                     
-                    val startDest = if (sessionManager.isLoggedIn()) "home" else "login"
+                    val startDest = "splash"
 
                     NavHost(navController = navController, startDestination = startDest) {
+                        composable("splash") {
+                            com.collegecanteen.app.ui.auth.SplashScreen(
+                                isLoggedIn = sessionManager.isLoggedIn(),
+                                onNavigateToHome = {
+                                    navController.navigate("home") {
+                                        popUpTo("splash") { inclusive = true }
+                                    }
+                                },
+                                onNavigateToLogin = {
+                                    navController.navigate("login") {
+                                        popUpTo("splash") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
                         composable("login") {
                             LoginScreen(
                                 viewModel = loginViewModel,
@@ -61,7 +76,13 @@ class MainActivity : ComponentActivity() {
                                         popUpTo("login") { inclusive = true }
                                     }
                                 },
-                                onNavigateToRegister = { navController.navigate("register") }
+                                onNavigateToRegister = { navController.navigate("register") },
+                                onNavigateToForgotPassword = { navController.navigate("forgot_password") }
+                            )
+                        }
+                        composable("forgot_password") {
+                            com.collegecanteen.app.ui.auth.ForgotPasswordScreen(
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
                         composable("register") {
@@ -80,7 +101,22 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToMenu = { navController.navigate("menu") },
                                 onNavigateToCart = { navController.navigate("cart") },
                                 onNavigateToOrders = { navController.navigate("orders") },
-                                onNavigateToProfile = { /* TODO */ }
+                                onNavigateToProfile = { navController.navigate("profile") }
+                            )
+                        }
+                        composable("profile") {
+                            val userId = sessionManager.getUserId()
+                            val token = sessionManager.getToken() ?: ""
+                            com.collegecanteen.app.ui.home.ProfileScreen(
+                                userId = userId,
+                                token = token,
+                                onNavigateBack = { navController.popBackStack() },
+                                onLogout = {
+                                    sessionManager.clearSession()
+                                    navController.navigate("login") {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                }
                             )
                         }
                         composable("menu") {
@@ -114,6 +150,22 @@ class MainActivity : ComponentActivity() {
                             com.collegecanteen.app.ui.orders.OrdersScreen(
                                 userId = userId,
                                 token = token,
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateToOrderDetails = { orderId ->
+                                    navController.navigate("order_details/$orderId")
+                                }
+                            )
+                        }
+                        composable("order_details/{orderId}") { backStackEntry ->
+                            val orderIdString = backStackEntry.arguments?.getString("orderId") ?: "0"
+                            val orderId = orderIdString.toIntOrNull() ?: 0
+                            val userId = sessionManager.getUserId()
+                            val token = sessionManager.getToken() ?: ""
+                            
+                            com.collegecanteen.app.ui.orders.OrderDetailsScreen(
+                                userId = userId,
+                                token = token,
+                                orderId = orderId,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
